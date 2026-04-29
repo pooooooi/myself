@@ -98,12 +98,17 @@ let dropHandled = false;
 let linkingId = null;
 let pendingFocusId = null;
 let timerId = null;
+let showArchivedEntries = false;
+let stepMode = false;
+let stepIndex = 0;
 const expandedReflections = new Set();
 
 const coreText = document.querySelector("#coreText");
 const links = document.querySelector("#links");
 const entryTabs = document.querySelector("#entryTabs");
 const connectionStatus = document.querySelector("#connectionStatus");
+const stepControls = document.querySelector("#stepControls");
+const stepLabel = document.querySelector("#stepLabel");
 const template = document.querySelector("#nodeTemplate");
 const editor = document.querySelector("#editor");
 const emptyState = document.querySelector("#emptyState");
@@ -117,9 +122,21 @@ const experimentOverlay = document.querySelector("#experimentOverlay");
 const overlayPracticeText = document.querySelector("#overlayPracticeText");
 const overlayTimer = document.querySelector("#overlayTimer");
 const overlayEnd = document.querySelector("#overlayEnd");
+const installPrompt = document.querySelector("#installPrompt");
+const installApp = document.querySelector("#installApp");
+const dismissInstall = document.querySelector("#dismissInstall");
+let deferredInstallPrompt = null;
 
 document.querySelector("#addRoot").addEventListener("click", () => addNode(null, "action", { prepend: true }));
 document.querySelector("#newEntry").addEventListener("click", createEntry);
+document.querySelector("#archiveEntry").addEventListener("click", archiveCurrentEntry);
+document.querySelector("#deleteEntry").addEventListener("click", deleteCurrentEntry);
+document.querySelector("#toggleArchived").addEventListener("click", toggleArchivedEntries);
+document.querySelector("#stepMode").addEventListener("click", toggleStepMode);
+document.querySelector("#prevStep").addEventListener("click", () => moveStep(-1));
+document.querySelector("#nextStep").addEventListener("click", () => moveStep(1));
+installApp.addEventListener("click", installPwa);
+dismissInstall.addEventListener("click", dismissInstallPrompt);
 document.querySelector("#exportData").addEventListener("click", exportData);
 document.querySelector("#importData").addEventListener("click", () => importFile.click());
 document.querySelector("#resetDemo").addEventListener("click", resetDemo);
@@ -204,6 +221,7 @@ document.querySelectorAll(".lane-body").forEach((lane) => {
 render();
 if (state.activeSessionId) startTimer();
 updateExperimentOverlay();
+setupInstallPrompt();
 
 function loadAppState() {
   const raw = localStorage.getItem(STORAGE_KEY) ?? findLegacyState();
@@ -256,14 +274,20 @@ function normalizeEntry(rawEntry) {
   entry.createdAt = Number.isFinite(Number(rawEntry?.createdAt)) ? Number(rawEntry.createdAt) : Date.now();
   entry.updatedAt = Number.isFinite(Number(rawEntry?.updatedAt)) ? Number(rawEntry.updatedAt) : entry.createdAt;
   entry.customTitle = typeof rawEntry?.customTitle === "string" ? rawEntry.customTitle : "";
+  entry.archivedAt = Number.isFinite(Number(rawEntry?.archivedAt)) ? Number(rawEntry.archivedAt) : null;
   return entry;
 }
 
 function getActiveEntry() {
   return (
     appState.entries.find((entry) => entry.id === appState.activeEntryId) ??
+    getVisibleEntries()[0] ??
     appState.entries[0]
   );
+}
+
+function getVisibleEntries() {
+  return appState.entries.filter((entry) => showArchivedEntries || !entry.archivedAt);
 }
 
 function normalizeState(rawState) {
@@ -334,6 +358,44 @@ function hasCorruptedAppText(targetAppState) {
   ]);
   const corruptedTextPattern = new RegExp("[\\u7e3a\\u7e67\\u86df\\u9666\\u8700\\u8b41\\u8c4c\\u8b17\\u9695\\u8ae2\\u8389]");
   return values.some((value) => corruptedTextPattern.test(value));
+}
+
+function setupInstallPrompt() {
+  if (localStorage.getItem("self-map-install-dismissed") === "1") return;
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    showInstallPrompt();
+  });
+  window.addEventListener("appinstalled", dismissInstallPrompt);
+
+  const isStandalone =
+    window.matchMedia?.("(display-mode: standalone)").matches ||
+    window.navigator.standalone;
+  if (!isStandalone) {
+    window.setTimeout(showInstallPrompt, 1800);
+  }
+}
+
+function showInstallPrompt() {
+  if (localStorage.getItem("self-map-install-dismissed") === "1") return;
+  installPrompt.classList.remove("hidden");
+}
+
+async function installPwa() {
+  if (!deferredInstallPrompt) {
+    showSaveStatus("ブラウザのメニューからホーム画面に追加できます");
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  dismissInstallPrompt();
+}
+
+function dismissInstallPrompt() {
+  localStorage.setItem("self-map-install-dismissed", "1");
+  installPrompt.classList.add("hidden");
 }
 
 function migrateType(type) {
@@ -451,10 +513,12 @@ function saveAndRender() {
 
 function render() {
   state = getActiveEntry();
+  appState.activeEntryId = state.id;
   coreText.value = state.core;
   renderEntryTabs();
   renderLaneHeaders();
   updateConnectionStatus();
+  renderStepMode();
 
   document.querySelectorAll(".lane-body").forEach((lane) => {
     lane.innerHTML = "";
@@ -476,10 +540,13 @@ function render() {
 
 function renderEntryTabs() {
   entryTabs.innerHTML = "";
-  for (const entry of [...appState.entries].sort((a, b) => b.updatedAt - a.updatedAt)) {
+  document.querySelector("#toggleArchived").textContent = showArchivedEntries ? "通常を見る" : "保管を見る";
+  document.querySelector("#archiveEntry").textContent = state.archivedAt ? "保管解除" : "保管";
+  for (const entry of [...getVisibleEntries()].sort((a, b) => b.updatedAt - a.updatedAt)) {
     const wrapper = document.createElement("div");
     wrapper.className = "entry-tab";
     wrapper.classList.toggle("active", entry.id === appState.activeEntryId);
+    wrapper.classList.toggle("archived", Boolean(entry.archivedAt));
 
     const name = document.createElement("input");
     name.className = "entry-title-input";
@@ -525,6 +592,41 @@ function createEntry() {
   addNode(null, "action", { prepend: true });
 }
 
+function archiveCurrentEntry() {
+  const activeEntries = appState.entries.filter((entry) => !entry.archivedAt);
+  if (!state.archivedAt && activeEntries.length <= 1) {
+    alert("最後の出来事は保管できません。新しい出来事を作ってから保管してください。");
+    return;
+  }
+  state.archivedAt = state.archivedAt ? null : Date.now();
+  if (state.archivedAt) {
+    const nextEntry = appState.entries.find((entry) => !entry.archivedAt && entry.id !== state.id);
+    if (nextEntry) appState.activeEntryId = nextEntry.id;
+  }
+  saveAndRender();
+}
+
+function deleteCurrentEntry() {
+  if (appState.entries.length <= 1) {
+    alert("最後の出来事は削除できません。初期例に戻すか、内容を書き換えて使ってください。");
+    return;
+  }
+  if (!confirm("この出来事を削除しますか？元に戻せません。")) return;
+  const deletingId = state.id;
+  appState.entries = appState.entries.filter((entry) => entry.id !== deletingId);
+  appState.activeEntryId = getVisibleEntries()[0]?.id ?? appState.entries[0].id;
+  state = getActiveEntry();
+  saveAndRender();
+}
+
+function toggleArchivedEntries() {
+  showArchivedEntries = !showArchivedEntries;
+  if (!getVisibleEntries().some((entry) => entry.id === appState.activeEntryId)) {
+    appState.activeEntryId = getVisibleEntries()[0]?.id ?? appState.entries[0].id;
+  }
+  saveAndRender();
+}
+
 function switchEntry(id) {
   if (appState.activeEntryId === id) return;
   appState.activeEntryId = id;
@@ -553,6 +655,36 @@ function renderLaneHeaders() {
     const label = typeLabels[lane.dataset.type];
     const title = lane.querySelector("header span");
     if (label && title) title.textContent = label;
+  });
+}
+
+function toggleStepMode() {
+  stepMode = !stepMode;
+  if (state.selectedId) {
+    const selected = findNode(state.selectedId);
+    const selectedIndex = typeOrder.indexOf(selected?.type);
+    if (selectedIndex >= 0) stepIndex = selectedIndex;
+  }
+  renderStepMode();
+}
+
+function moveStep(delta) {
+  stepIndex = Math.min(Math.max(stepIndex + delta, 0), typeOrder.length - 1);
+  renderStepMode();
+  document.querySelector(".map-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderStepMode() {
+  document.body.classList.toggle("step-mode", stepMode);
+  document.querySelector("#stepMode").classList.toggle("primary", stepMode);
+  document.querySelector("#stepMode").classList.toggle("secondary", !stepMode);
+  stepControls.classList.toggle("hidden", !stepMode);
+  const activeType = typeOrder[stepIndex];
+  stepLabel.textContent = `${stepIndex + 1}/${typeOrder.length} ${typeLabels[activeType]}`;
+  document.querySelector("#prevStep").disabled = stepIndex === 0;
+  document.querySelector("#nextStep").disabled = stepIndex === typeOrder.length - 1;
+  document.querySelectorAll(".lane").forEach((lane) => {
+    lane.classList.toggle("step-active", lane.dataset.type === activeType);
   });
 }
 
@@ -674,8 +806,44 @@ function renderCard(node) {
     deleteNode(node.id);
   });
 
+  if (node.type === "practice" && isPracticeTooLarge(node.text)) {
+    card.append(renderShrinkHint(node, textInput));
+  }
+
   if (node.type === "practice") renderPracticeTools(card, node);
   return card;
+}
+
+function isPracticeTooLarge(text) {
+  const value = text.trim();
+  if (!value) return false;
+  return value.length > 24 || /毎日|全部|完璧|次回|次の|いつか|ちゃんと|しっかり/.test(value);
+}
+
+function renderShrinkHint(node, textInput) {
+  const hint = document.createElement("section");
+  hint.className = "shrink-hint";
+  hint.innerHTML = `
+    <span>大きいかも。10秒でできる形にする？</span>
+    <button type="button">もっと小さくする</button>
+  `;
+  hint.querySelector("button").addEventListener("click", (event) => {
+    event.stopPropagation();
+    node.text = suggestSmallerPractice(node.text);
+    textInput.value = node.text;
+    resizeText(textInput);
+    saveState();
+    render();
+  });
+  return hint;
+}
+
+function suggestSmallerPractice(text) {
+  if (/資料|書類|ファイル|画面/.test(text)) return "開いて、最初の1行だけ見る";
+  if (/連絡|返信|メール|チャット/.test(text)) return "宛先だけ開く";
+  if (/片付|掃除/.test(text)) return "目の前の1つだけ動かす";
+  if (/運動|歩/.test(text)) return "立って10秒だけ伸びる";
+  return "最初の10秒だけ手をつける";
 }
 
 function renderPracticeTools(card, node) {
@@ -766,6 +934,7 @@ function renderReflection(session) {
       次はどう調整する？
       <textarea class="session-next" rows="3"></textarea>
     </label>
+    <button class="reflection-apply" type="button">新しい価値観へ反映</button>
   `;
 
   const result = panel.querySelector(".session-result");
@@ -787,8 +956,43 @@ function renderReflection(session) {
     session.nextAction = next.value;
     saveState();
   });
+  panel.querySelector(".reflection-apply").addEventListener("click", (event) => {
+    event.stopPropagation();
+    applyReflectionToValue(session);
+  });
 
   return panel;
+}
+
+function applyReflectionToValue(session) {
+  const sourceText = (session.nextAction || session.result || "").trim();
+  if (!sourceText) {
+    showSaveStatus("振り返りを先に書いてください");
+    return;
+  }
+  const practice = findNode(session.nodeId);
+  const parentValue = practice?.parentIds
+    ?.map((id) => findNode(id))
+    .find((node) => node?.type === "value");
+  const valueText = `やってみて調整できる。まず小さく戻ればいい。`;
+  if (parentValue) {
+    parentValue.text = parentValue.text
+      ? `${parentValue.text}\n${valueText}`
+      : valueText;
+    state.selectedId = parentValue.id;
+  } else {
+    const node = {
+      id: crypto.randomUUID(),
+      parentIds: [],
+      type: "value",
+      text: valueText,
+      confidence: 50,
+    };
+    state.nodes.push(node);
+    state.selectedId = node.id;
+  }
+  saveAndRender();
+  showSaveStatus("新しい価値観に反映しました");
 }
 
 function drawLinks() {

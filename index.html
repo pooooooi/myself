@@ -23,9 +23,10 @@
         <div class="actions">
           <span class="save-status" id="saveStatus">保存済み</span>
           <button class="button secondary" id="exportData" type="button">書き出し</button>
-          <button class="button secondary" id="importData" type="button">読み込み</button>
-          <button class="button secondary" id="resetDemo" type="button">初期例</button>
-          <button class="button primary" id="addRoot" type="button">出来事を追加</button>
+            <button class="button secondary" id="importData" type="button">読み込み</button>
+            <button class="button secondary" id="resetDemo" type="button">初期例</button>
+            <button class="button secondary" id="stepMode" type="button">1問いずつ</button>
+            <button class="button primary" id="addRoot" type="button">出来事を追加</button>
           <input id="importFile" type="file" accept="application/json,.json" hidden>
         </div>
       </header>
@@ -33,7 +34,12 @@
       <section class="entry-tabs-panel" aria-label="出来事タブ">
         <div class="entry-tabs-head">
           <strong>出来事</strong>
-          <button class="button primary" id="newEntry" type="button">新しい出来事</button>
+          <div class="entry-actions">
+            <button class="button secondary" id="toggleArchived" type="button">保管を見る</button>
+            <button class="button secondary" id="archiveEntry" type="button">保管</button>
+            <button class="button danger" id="deleteEntry" type="button">削除</button>
+            <button class="button primary" id="newEntry" type="button">新しい出来事</button>
+          </div>
         </div>
         <div class="entry-tabs" id="entryTabs"></div>
       </section>
@@ -69,6 +75,11 @@
       </section>
 
       <section class="board" aria-label="自己理解ボード">
+        <section class="step-controls hidden" id="stepControls" aria-label="1問いずつ進む">
+          <button class="button secondary" id="prevStep" type="button">前へ</button>
+          <span id="stepLabel"></span>
+          <button class="button primary" id="nextStep" type="button">次へ</button>
+        </section>
         <section class="map-panel">
           <div class="connection-status hidden" id="connectionStatus"></div>
           <svg class="links" id="links" aria-hidden="true"></svg>
@@ -169,6 +180,15 @@
         <button class="overlay-end" id="overlayEnd" type="button">終了して振り返る</button>
       </div>
     </section>
+
+    <aside class="install-prompt hidden" id="installPrompt" aria-label="ホーム画面に追加">
+      <div>
+        <strong>ホーム画面に追加できます</strong>
+        <span>すぐ書けるように、アプリのように開けます。</span>
+      </div>
+      <button class="button primary" id="installApp" type="button">追加</button>
+      <button class="install-dismiss" id="dismissInstall" type="button" aria-label="閉じる">×</button>
+    </aside>
 
     <template id="nodeTemplate">
       <article class="card">

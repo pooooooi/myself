@@ -147,6 +147,14 @@ h1 {
   gap: 10px;
 }
 
+.entry-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .entry-tabs-head strong {
   font-size: 14px;
 }
@@ -180,6 +188,10 @@ h1 {
   box-shadow: inset 0 0 0 2px rgba(38, 113, 116, 0.14);
 }
 
+.entry-tab.archived {
+  opacity: 0.62;
+}
+
 .entry-title-input {
   width: 100%;
   border: 0;
@@ -203,6 +215,30 @@ h1 {
   color: var(--muted);
   font-size: 11px;
   font-weight: 850;
+}
+
+.step-controls {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 254, 250, 0.92);
+  box-shadow: var(--soft-shadow);
+  padding: 10px;
+}
+
+.step-controls span {
+  text-align: center;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.step-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
 }
 
 .panel-title {
@@ -842,6 +878,32 @@ h1 {
   border-top: 1px solid var(--line);
 }
 
+.shrink-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid rgba(39, 138, 78, 0.22);
+  border-radius: 8px;
+  background: rgba(241, 255, 244, 0.78);
+  padding: 8px;
+  color: #285738;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.shrink-hint button,
+.reflection-apply {
+  min-height: 30px;
+  border-radius: 999px;
+  padding: 0 10px;
+  background: #278a4e;
+  color: white;
+  font-size: 12px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
 .experiment-panel.compact {
   gap: 7px;
   padding-top: 8px;
@@ -947,6 +1009,52 @@ select {
   display: none;
 }
 
+.install-prompt {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 120;
+  max-width: 360px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(217, 225, 220, 0.94);
+  border-radius: 14px;
+  background: rgba(255, 254, 250, 0.96);
+  box-shadow: var(--shadow);
+  padding: 12px;
+}
+
+.install-prompt.hidden {
+  display: none;
+}
+
+.install-prompt div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.install-prompt strong {
+  font-size: 13px;
+}
+
+.install-prompt span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.install-dismiss {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #edf2ef;
+  color: var(--ink);
+  font-weight: 850;
+}
+
 @media (max-width: 1100px) {
   .board {
     grid-template-columns: 1fr;
@@ -1020,7 +1128,7 @@ select {
 
   .actions {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
   }
 
@@ -1064,6 +1172,16 @@ select {
 
   .entry-tabs-head strong {
     font-size: 15px;
+  }
+
+  .entry-tabs-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .entry-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 
   .entry-tabs-head .button {
@@ -1137,6 +1255,15 @@ select {
     box-shadow: none;
   }
 
+  .step-controls {
+    position: sticky;
+    top: 126px;
+    z-index: 10;
+    border-radius: 14px;
+    background: rgba(255, 254, 250, 0.94);
+    backdrop-filter: blur(14px);
+  }
+
   .connection-status {
     position: sticky;
     top: 8px;
@@ -1155,6 +1282,14 @@ select {
     display: flex;
     flex-direction: column;
     gap: 14px;
+  }
+
+  .step-mode .lane {
+    display: none;
+  }
+
+  .step-mode .lane.step-active {
+    display: flex;
   }
 
   .lane {
@@ -1263,5 +1398,23 @@ select {
 
   .experiment-focus {
     gap: 18px;
+  }
+
+  .shrink-hint {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .install-prompt {
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    grid-template-columns: 1fr auto;
+  }
+
+  .install-dismiss {
+    position: absolute;
+    top: 8px;
+    right: 8px;
   }
 }
