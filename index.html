@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#278a4e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Self Map">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Self Map</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Self Map</p>
+          <h1>過去の出来事から、次に試す行動を見つける</h1>
+        </div>
+        <div class="actions">
+          <span class="save-status" id="saveStatus">保存済み</span>
+          <button class="button secondary" id="exportData" type="button">書き出し</button>
+          <button class="button secondary" id="importData" type="button">読み込み</button>
+          <button class="button secondary" id="resetDemo" type="button">初期例</button>
+          <button class="button primary" id="addRoot" type="button">過去の出来事を追加</button>
+          <input id="importFile" type="file" accept="application/json,.json" hidden>
+        </div>
+      </header>
+
+      <section class="core-panel">
+        <div class="panel-title">過去の出来事から見えてきたこと</div>
+        <textarea
+          id="coreText"
+          class="core-text"
+          aria-label="過去の出来事から見えてきたこと"
+          placeholder="例: 失敗そのものより、「ちゃんとできない自分はだめだ」と見ていることが苦しさを強めている。"
+        ></textarea>
+      </section>
+
+      <section class="writing-guide" aria-label="書き方の参考">
+        <div class="guide-head">
+          <strong>書き方の参考</strong>
+          <span>過去の出来事から始めて、気持ち、思い込み、価値観を見つけて、小さく試す。</span>
+        </div>
+        <div class="guide-strip">
+          <p><b>過去の出来事</b><span>会議で言いたいことを飲み込んだ</span></p>
+          <i aria-hidden="true">→</i>
+          <p><b>気持ち</b><span>胸が詰まる、怖い、あとで悔しい</span></p>
+          <i aria-hidden="true">→</i>
+          <p><b>思い込み</b><span>変なことを言うと、場を壊してしまう</span></p>
+          <i aria-hidden="true">→</i>
+          <p><b>価値観</b><span>迷惑をかけない自分でいないといけない</span></p>
+          <i aria-hidden="true">→</i>
+          <p><b>新しい価値観</b><span>小さく意見を出すことも、場への参加になる</span></p>
+          <i aria-hidden="true">→</i>
+          <p><b>試す行動</b><span>次の会議で一度だけ質問をする</span></p>
+        </div>
+      </section>
+
+      <section class="board" aria-label="自己理解ボード">
+        <section class="map-panel">
+          <div class="connection-status hidden" id="connectionStatus"></div>
+          <svg class="links" id="links" aria-hidden="true"></svg>
+          <div class="columns" id="columns">
+            <section class="lane" data-type="action">
+              <header>
+                <span>過去の出来事</span>
+                <button class="lane-add" data-add-type="action" type="button" title="過去の出来事を追加">+</button>
+              </header>
+              <div class="lane-body" data-lane="action"></div>
+            </section>
+
+            <section class="lane" data-type="branch">
+              <header>
+                <span>気持ち</span>
+                <button class="lane-add" data-add-type="branch" type="button" title="気持ちを追加">+</button>
+              </header>
+              <div class="lane-body" data-lane="branch"></div>
+            </section>
+
+            <section class="lane" data-type="premise">
+              <header>
+                <span>思い込み</span>
+                <button class="lane-add" data-add-type="premise" type="button" title="思い込みを追加">+</button>
+              </header>
+              <div class="lane-body" data-lane="premise"></div>
+            </section>
+
+            <section class="lane" data-type="core">
+              <header>
+                <span>価値観</span>
+                <button class="lane-add" data-add-type="core" type="button" title="価値観を追加">+</button>
+              </header>
+              <div class="lane-body" data-lane="core"></div>
+            </section>
+
+            <section class="lane" data-type="value">
+              <header>
+                <span>新しい価値観</span>
+                <button class="lane-add" data-add-type="value" type="button" title="新しい価値観を追加">+</button>
+              </header>
+              <div class="lane-body" data-lane="value"></div>
+            </section>
+
+            <section class="lane" data-type="practice">
+              <header>
+                <span>試す行動</span>
+                <button class="lane-add" data-add-type="practice" type="button" title="試す行動を追加">+</button>
+              </header>
+              <div class="lane-body" data-lane="practice"></div>
+            </section>
+          </div>
+        </section>
+
+        <aside class="inspector" aria-label="編集">
+          <div class="panel-title">選択中</div>
+          <div id="emptyState" class="empty-state">カードを選択</div>
+          <form id="editor" class="editor hidden">
+            <label>
+              種類
+              <select id="nodeType">
+                <option value="action">過去の出来事</option>
+                <option value="branch">気持ち</option>
+                <option value="premise">思い込み</option>
+                <option value="core">価値観</option>
+                <option value="value">新しい価値観</option>
+                <option value="practice">試す行動</option>
+              </select>
+            </label>
+            <label>
+              接続先
+              <select id="nodeParent"></select>
+            </label>
+            <label class="hidden">
+              確信度
+              <input id="nodeConfidence" type="range" min="0" max="100" step="5">
+            </label>
+            <div class="confidence-row hidden">
+              <span>仮説</span>
+              <strong id="confidenceValue">50%</strong>
+              <span>確か</span>
+            </div>
+            <div class="button-row">
+              <button id="addChild" class="button primary" type="button">次のカードを追加</button>
+              <button id="deleteNode" class="button danger" type="button">削除</button>
+            </div>
+          </form>
+        </aside>
+      </section>
+    </main>
+
+    <section class="experiment-overlay hidden" id="experimentOverlay" aria-live="polite">
+      <div class="experiment-focus">
+        <p class="experiment-kicker">行動中</p>
+        <h2 id="overlayPracticeText"></h2>
+        <div class="overlay-timer" id="overlayTimer">00:00</div>
+        <p class="overlay-note">成果ではなく、やってみた時の感覚を観察する</p>
+        <button class="overlay-end" id="overlayEnd" type="button">終了して振り返る</button>
+      </div>
+    </section>
+
+    <template id="nodeTemplate">
+      <article class="card">
+        <div class="card-meta" draggable="true" title="ドラッグして移動">
+          <span class="type-label"></span>
+        </div>
+        <p class="card-question"></p>
+        <textarea class="card-text" rows="4"></textarea>
+        <div class="card-tools">
+          <button class="card-link" type="button" title="接続を追加・解除">○</button>
+          <button class="card-add" type="button" title="次のカードを追加">+</button>
+          <button class="card-delete" type="button" title="削除">×</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("service-worker.js");
+        });
+      }
+    </script>
+  </body>
+</html>

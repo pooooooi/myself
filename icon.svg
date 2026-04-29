@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Self Map">
+  <rect width="512" height="512" rx="112" fill="#f4f6f1"/>
+  <path fill="#278a4e" d="M112 128h168c68 0 120 52 120 120s-52 120-120 120H112V128Z"/>
+  <path fill="#fffefa" d="M152 176h126c40 0 72 32 72 72s-32 72-72 72H152V176Z"/>
+  <circle cx="178" cy="248" r="22" fill="#b6513d"/>
+  <circle cx="256" cy="248" r="22" fill="#765c8f"/>
+  <circle cx="334" cy="248" r="22" fill="#3c6f4a"/>
+  <path fill="none" stroke="#202522" stroke-linecap="round" stroke-width="20" d="M178 248h156"/>
+</svg>
