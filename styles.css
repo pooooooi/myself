@@ -901,3 +901,164 @@ select {
     min-width: 1320px;
   }
 }
+
+@media (max-width: 720px) {
+  body {
+    background-size: 28px 28px;
+  }
+
+  .app {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .topbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .save-status {
+    grid-column: 1 / -1;
+  }
+
+  .button {
+    min-height: 42px;
+    padding: 0 10px;
+  }
+
+  .core-panel,
+  .writing-guide,
+  .map-panel {
+    border-radius: 8px;
+    box-shadow: var(--soft-shadow);
+  }
+
+  .core-panel {
+    padding: 12px;
+  }
+
+  .core-text {
+    min-height: 96px;
+    max-height: none;
+  }
+
+  .guide-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .guide-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scroll-snap-type: x proximity;
+  }
+
+  .guide-strip p {
+    min-width: 190px;
+    scroll-snap-align: start;
+  }
+
+  .guide-strip i {
+    display: grid;
+    flex: 0 0 20px;
+    place-items: center;
+  }
+
+  .map-panel {
+    min-height: auto;
+    overflow: visible;
+    padding: 10px;
+  }
+
+  .connection-status {
+    position: sticky;
+    top: 8px;
+    max-width: none;
+    margin: 0 0 10px;
+    border-radius: 8px;
+    white-space: normal;
+  }
+
+  .links {
+    display: none;
+  }
+
+  .columns {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lane {
+    min-height: 0;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .lane header {
+    position: static;
+    min-height: 38px;
+    margin: 0;
+  }
+
+  .lane-body {
+    gap: 8px;
+  }
+
+  .lane-body:empty,
+  .lane-body:empty::before {
+    min-height: 82px;
+  }
+
+  .card {
+    gap: 8px;
+    padding: 11px;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .card-text {
+    min-height: 88px;
+  }
+
+  .card-tools {
+    justify-content: space-between;
+  }
+
+  .card-link,
+  .card-add,
+  .card-delete {
+    width: 36px;
+    height: 36px;
+  }
+
+  .card[data-type="practice"] .experiment-start {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .experiment-overlay {
+    padding: 18px;
+  }
+
+  .experiment-focus {
+    gap: 18px;
+  }
+}
