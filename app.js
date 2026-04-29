@@ -118,7 +118,7 @@ const overlayPracticeText = document.querySelector("#overlayPracticeText");
 const overlayTimer = document.querySelector("#overlayTimer");
 const overlayEnd = document.querySelector("#overlayEnd");
 
-document.querySelector("#addRoot").addEventListener("click", () => addNode(null, "action"));
+document.querySelector("#addRoot").addEventListener("click", () => addNode(null, "action", { prepend: true }));
 document.querySelector("#newEntry").addEventListener("click", createEntry);
 document.querySelector("#exportData").addEventListener("click", exportData);
 document.querySelector("#importData").addEventListener("click", () => importFile.click());
@@ -255,7 +255,7 @@ function normalizeEntry(rawEntry) {
   entry.id = typeof rawEntry?.id === "string" ? rawEntry.id : crypto.randomUUID();
   entry.createdAt = Number.isFinite(Number(rawEntry?.createdAt)) ? Number(rawEntry.createdAt) : Date.now();
   entry.updatedAt = Number.isFinite(Number(rawEntry?.updatedAt)) ? Number(rawEntry.updatedAt) : entry.createdAt;
-  entry.title = deriveEntryTitle(entry);
+  entry.customTitle = typeof rawEntry?.customTitle === "string" ? rawEntry.customTitle : "";
   return entry;
 }
 
@@ -382,7 +382,6 @@ function normalizeParentIds(node) {
 
 function saveState() {
   state.updatedAt = Date.now();
-  state.title = deriveEntryTitle(state);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
   showSaveStatus("保存済み");
 }
@@ -445,7 +444,6 @@ function importData(event) {
   });
   reader.readAsText(file);
 }
-
 function saveAndRender() {
   saveState();
   render();
@@ -479,16 +477,32 @@ function render() {
 function renderEntryTabs() {
   entryTabs.innerHTML = "";
   for (const entry of [...appState.entries].sort((a, b) => b.updatedAt - a.updatedAt)) {
-    const button = document.createElement("button");
-    button.className = "entry-tab";
-    button.type = "button";
-    button.classList.toggle("active", entry.id === appState.activeEntryId);
-    button.innerHTML = `
-      <span>${escapeHtml(deriveEntryTitle(entry))}</span>
-      <time>${formatEntryDate(entry.updatedAt)}</time>
-    `;
-    button.addEventListener("click", () => switchEntry(entry.id));
-    entryTabs.append(button);
+    const wrapper = document.createElement("div");
+    wrapper.className = "entry-tab";
+    wrapper.classList.toggle("active", entry.id === appState.activeEntryId);
+
+    const name = document.createElement("input");
+    name.className = "entry-title-input";
+    name.value = deriveEntryTitle(entry);
+    name.setAttribute("aria-label", "出来事の名前");
+    name.addEventListener("focus", () => switchEntry(entry.id));
+    name.addEventListener("input", () => {
+      entry.customTitle = name.value;
+      entry.updatedAt = Date.now();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    });
+    name.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") name.blur();
+    });
+
+    const meta = document.createElement("button");
+    meta.className = "entry-tab-meta";
+    meta.type = "button";
+    meta.textContent = formatEntryDate(entry.updatedAt);
+    meta.addEventListener("click", () => switchEntry(entry.id));
+
+    wrapper.append(name, meta);
+    entryTabs.append(wrapper);
   }
 }
 
@@ -501,13 +515,14 @@ function createEntry() {
     activeSessionId: null,
     sessions: [],
     nodes: [],
+    customTitle: "新しい出来事",
     createdAt: Date.now(),
     updatedAt: Date.now(),
   });
   appState.entries.push(entry);
   appState.activeEntryId = entry.id;
   state = entry;
-  saveAndRender();
+  addNode(null, "action", { prepend: true });
 }
 
 function switchEntry(id) {
@@ -522,6 +537,7 @@ function switchEntry(id) {
 }
 
 function deriveEntryTitle(entry) {
+  if (entry.customTitle?.trim()) return entry.customTitle.trim();
   const actionText = entry.nodes?.find((node) => node.type === "action" && node.text.trim())?.text.trim();
   if (actionText) return actionText.slice(0, 28);
   return "新しい出来事";
@@ -532,16 +548,6 @@ function formatEntryDate(timestamp) {
   if (Number.isNaN(date.getTime())) return "";
   return `${date.getMonth() + 1}/${date.getDate()}`;
 }
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
 function renderLaneHeaders() {
   document.querySelectorAll(".lane").forEach((lane) => {
     const label = typeLabels[lane.dataset.type];
@@ -1074,7 +1080,7 @@ function deleteNode(id) {
   saveAndRender();
 }
 
-function addNode(parentId, type) {
+function addNode(parentId, type, options = {}) {
   const node = {
     id: crypto.randomUUID(),
     parentIds: parentId ? [parentId] : [],
@@ -1083,7 +1089,11 @@ function addNode(parentId, type) {
     confidence: 50,
   };
   normalizeConnections(node);
-  state.nodes.push(node);
+  if (options.prepend) {
+    state.nodes.unshift(node);
+  } else {
+    state.nodes.push(node);
+  }
   state.selectedId = node.id;
   pendingFocusId = node.id;
   saveAndRender();

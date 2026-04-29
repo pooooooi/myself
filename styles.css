@@ -180,16 +180,26 @@ h1 {
   box-shadow: inset 0 0 0 2px rgba(38, 113, 116, 0.14);
 }
 
-.entry-tab span {
+.entry-title-input {
   width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: 13px;
   font-weight: 850;
 }
 
-.entry-tab time {
+.entry-title-input::placeholder {
+  color: var(--muted);
+}
+
+.entry-tab-meta {
+  min-height: auto;
+  padding: 0;
+  background: transparent;
   color: var(--muted);
   font-size: 11px;
   font-weight: 850;
@@ -1078,7 +1088,7 @@ select {
       0 10px 22px rgba(38, 113, 116, 0.12);
   }
 
-  .entry-tab span {
+  .entry-title-input {
     font-size: 14px;
   }
 
