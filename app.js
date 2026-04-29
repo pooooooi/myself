@@ -92,7 +92,8 @@ const defaultState = {
   ],
 };
 
-let state = loadState();
+let appState = loadAppState();
+let state = getActiveEntry();
 let draggedId = null;
 let dropHandled = false;
 let linkingId = null;
@@ -102,6 +103,7 @@ const expandedReflections = new Set();
 
 const coreText = document.querySelector("#coreText");
 const links = document.querySelector("#links");
+const entryTabs = document.querySelector("#entryTabs");
 const connectionStatus = document.querySelector("#connectionStatus");
 const template = document.querySelector("#nodeTemplate");
 const editor = document.querySelector("#editor");
@@ -118,6 +120,7 @@ const overlayTimer = document.querySelector("#overlayTimer");
 const overlayEnd = document.querySelector("#overlayEnd");
 
 document.querySelector("#addRoot").addEventListener("click", () => addNode(null, "action"));
+document.querySelector("#newEntry").addEventListener("click", createEntry);
 document.querySelector("#exportData").addEventListener("click", exportData);
 document.querySelector("#importData").addEventListener("click", () => importFile.click());
 document.querySelector("#resetDemo").addEventListener("click", resetDemo);
@@ -203,15 +206,18 @@ render();
 if (state.activeSessionId) startTimer();
 updateExperimentOverlay();
 
-function loadState() {
+function loadAppState() {
   const raw = localStorage.getItem(STORAGE_KEY) ?? findLegacyState();
-  if (!raw) return normalizeState(structuredClone(defaultState));
+  if (!raw) return createAppStateFromEntry(structuredClone(defaultState));
 
   try {
-    const loadedState = normalizeState(JSON.parse(raw));
-    return hasCorruptedText(loadedState) ? normalizeState(structuredClone(defaultState)) : loadedState;
+    const parsed = JSON.parse(raw);
+    const loadedState = normalizeAppState(parsed);
+    return hasCorruptedAppText(loadedState)
+      ? createAppStateFromEntry(structuredClone(defaultState))
+      : loadedState;
   } catch {
-    return normalizeState(structuredClone(defaultState));
+    return createAppStateFromEntry(structuredClone(defaultState));
   }
 }
 
@@ -221,6 +227,44 @@ function findLegacyState() {
     if (raw) return raw;
   }
   return null;
+}
+
+function createAppStateFromEntry(entry) {
+  const normalizedEntry = normalizeEntry(entry);
+  return {
+    activeEntryId: normalizedEntry.id,
+    entries: [normalizedEntry],
+  };
+}
+
+function normalizeAppState(rawState) {
+  if (Array.isArray(rawState?.entries)) {
+    const entries = rawState.entries.map(normalizeEntry).filter(Boolean);
+    if (!entries.length) return createAppStateFromEntry(structuredClone(defaultState));
+    const activeEntryId = entries.some((entry) => entry.id === rawState.activeEntryId)
+      ? rawState.activeEntryId
+      : entries[0].id;
+    return { activeEntryId, entries };
+  }
+
+  const importedState = rawState?.state ?? rawState;
+  return createAppStateFromEntry(importedState);
+}
+
+function normalizeEntry(rawEntry) {
+  const entry = normalizeState(rawEntry);
+  entry.id = typeof rawEntry?.id === "string" ? rawEntry.id : crypto.randomUUID();
+  entry.createdAt = Number.isFinite(Number(rawEntry?.createdAt)) ? Number(rawEntry.createdAt) : Date.now();
+  entry.updatedAt = Number.isFinite(Number(rawEntry?.updatedAt)) ? Number(rawEntry.updatedAt) : entry.createdAt;
+  entry.title = deriveEntryTitle(entry);
+  return entry;
+}
+
+function getActiveEntry() {
+  return (
+    appState.entries.find((entry) => entry.id === appState.activeEntryId) ??
+    appState.entries[0]
+  );
 }
 
 function normalizeState(rawState) {
@@ -278,16 +322,17 @@ function normalizeState(rawState) {
   return nextState;
 }
 
-function hasCorruptedText(targetState) {
-  const values = [
-    targetState.core,
-    ...targetState.nodes.map((node) => node.text),
-    ...targetState.sessions.flatMap((session) => [
+function hasCorruptedAppText(targetAppState) {
+  const values = targetAppState.entries.flatMap((entry) => [
+    entry.core,
+    entry.title,
+    ...entry.nodes.map((node) => node.text),
+    ...entry.sessions.flatMap((session) => [
       session.result,
       session.feeling,
       session.nextAction,
     ]),
-  ];
+  ]);
   const corruptedTextPattern = new RegExp("[\\u7e3a\\u7e67\\u86df\\u9666\\u8700\\u8b41\\u8c4c\\u8b17\\u9695\\u8ae2\\u8389]");
   return values.some((value) => corruptedTextPattern.test(value));
 }
@@ -337,7 +382,9 @@ function normalizeParentIds(node) {
 }
 
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  state.updatedAt = Date.now();
+  state.title = deriveEntryTitle(state);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
   showSaveStatus("保存済み");
 }
 
@@ -353,7 +400,8 @@ function resetDemo() {
   if (!confirm("初期例に戻しますか？ 今の内容は上書きされます。必要なら先に書き出してください。")) {
     return;
   }
-  state = normalizeState(structuredClone(defaultState));
+  appState = createAppStateFromEntry(structuredClone(defaultState));
+  state = getActiveEntry();
   saveAndRender();
 }
 
@@ -361,9 +409,9 @@ function exportData() {
   saveState();
   const payload = {
     app: "self-map",
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
-    state,
+    ...appState,
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json",
@@ -387,7 +435,8 @@ function importData(event) {
   reader.addEventListener("load", () => {
     try {
       const parsed = JSON.parse(String(reader.result));
-      state = normalizeState(parsed?.state ?? parsed);
+      appState = normalizeAppState(parsed);
+      state = getActiveEntry();
       saveAndRender();
       showSaveStatus("読み込みました");
     } catch {
@@ -404,7 +453,9 @@ function saveAndRender() {
 }
 
 function render() {
+  state = getActiveEntry();
   coreText.value = state.core;
+  renderEntryTabs();
   renderLaneHeaders();
   updateConnectionStatus();
 
@@ -424,6 +475,72 @@ function render() {
     drawLinks();
     focusPendingNode();
   });
+}
+
+function renderEntryTabs() {
+  entryTabs.innerHTML = "";
+  for (const entry of [...appState.entries].sort((a, b) => b.updatedAt - a.updatedAt)) {
+    const button = document.createElement("button");
+    button.className = "entry-tab";
+    button.type = "button";
+    button.classList.toggle("active", entry.id === appState.activeEntryId);
+    button.innerHTML = `
+      <span>${escapeHtml(deriveEntryTitle(entry))}</span>
+      <time>${formatEntryDate(entry.updatedAt)}</time>
+    `;
+    button.addEventListener("click", () => switchEntry(entry.id));
+    entryTabs.append(button);
+  }
+}
+
+function createEntry() {
+  const entry = normalizeEntry({
+    ...structuredClone(defaultState),
+    id: crypto.randomUUID(),
+    core: "",
+    selectedId: null,
+    activeSessionId: null,
+    sessions: [],
+    nodes: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  });
+  appState.entries.push(entry);
+  appState.activeEntryId = entry.id;
+  state = entry;
+  saveAndRender();
+}
+
+function switchEntry(id) {
+  if (appState.activeEntryId === id) return;
+  appState.activeEntryId = id;
+  state = getActiveEntry();
+  linkingId = null;
+  pendingFocusId = null;
+  stopTimerIfIdle();
+  saveAndRender();
+  updateExperimentOverlay();
+}
+
+function deriveEntryTitle(entry) {
+  const actionText = entry.nodes?.find((node) => node.type === "action" && node.text.trim())?.text.trim();
+  if (actionText) return actionText.slice(0, 28);
+  return "新しい出来事";
+}
+
+function formatEntryDate(timestamp) {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function renderLaneHeaders() {
