@@ -23,12 +23,12 @@ const typeLabels = {
 };
 
 const writingPrompts = {
-  action: "例: 会議で言いたいことを飲み込んだ",
-  branch: "例: 胸が詰まる、怖い、あとで悔しい",
-  premise: "例: 変なことを言うと、場を壊してしまう",
-  core: "例: 迷惑をかけない自分でいないといけない",
-  value: "例: 小さく意見を出すことも、場への参加になる",
-  practice: "例: 次の会議で一度だけ質問をする",
+  action: "例: 資料を開く前にスマホを見続けた",
+  branch: "例: 重い、失敗しそう、始めるのが怖い",
+  premise: "例: ちゃんと進められないなら触らない方がいい",
+  core: "例: 中途半端な自分はだめだ",
+  value: "例: 10秒戻るだけでも、流れは作れる",
+  practice: "例: 資料を開いて、タイトルだけ読む",
 };
 
 const writingQuestions = {
@@ -37,12 +37,12 @@ const writingQuestions = {
   premise: "その気持ちの奥に、どんな決めつけがありそう？",
   core: "今までの自分は、どんな価値観（ものさし）でこれを見ていた？",
   value: "これからは、どんな見方を試してみたい？",
-  practice: "その新しい見方を、今日どんな小さな行動で試す？",
+  practice: "今すぐできる10秒から3分の行動にすると？",
 };
 
 const defaultState = {
   core:
-    "過去の出来事から、気持ち、思い込み、価値観を見る。そこから新しい価値観と、試す行動へつなげる。",
+    "気分を変えてから動くより、10秒だけ手をつける方が戻りやすい。",
   selectedId: "n1",
   activeSessionId: null,
   sessions: [],
@@ -51,47 +51,46 @@ const defaultState = {
       id: "n1",
       parentIds: [],
       type: "action",
-      text: "会議で言いたいことを飲み込んだ",
+      text: "資料を開く前にスマホを見続けた",
       confidence: 80,
     },
     {
       id: "n2",
       parentIds: ["n1"],
       type: "branch",
-      text: "胸が詰まる。あとで悔しさが残る",
+      text: "重い。失敗しそうで、始めるのが怖い",
       confidence: 70,
     },
     {
       id: "n3",
       parentIds: ["n2"],
       type: "premise",
-      text: "変なことを言うと、場を壊してしまう",
+      text: "ちゃんと進められないなら触らない方がいい",
       confidence: 65,
     },
     {
       id: "n4",
       parentIds: ["n3"],
       type: "core",
-      text: "迷惑をかけない自分でいないといけない",
+      text: "中途半端な自分はだめだ",
       confidence: 55,
     },
     {
       id: "n5",
       parentIds: ["n4"],
       type: "value",
-      text: "小さく意見を出すことも、場への参加になる",
+      text: "10秒戻るだけでも、流れは作れる",
       confidence: 55,
     },
     {
       id: "n6",
       parentIds: ["n5"],
       type: "practice",
-      text: "次の会議で一度だけ質問をする",
+      text: "資料を開いて、タイトルだけ読む",
       confidence: 60,
     },
   ],
 };
-
 let appState = loadAppState();
 let state = getActiveEntry();
 let draggedId = null;

@@ -18,14 +18,14 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">Self Map</p>
-          <h1>過去の出来事から、次に試す行動を見つける</h1>
+          <h1>今すぐできる小さな行動に戻る</h1>
         </div>
         <div class="actions">
           <span class="save-status" id="saveStatus">保存済み</span>
           <button class="button secondary" id="exportData" type="button">書き出し</button>
           <button class="button secondary" id="importData" type="button">読み込み</button>
           <button class="button secondary" id="resetDemo" type="button">初期例</button>
-          <button class="button primary" id="addRoot" type="button">過去の出来事を追加</button>
+          <button class="button primary" id="addRoot" type="button">出来事を追加</button>
           <input id="importFile" type="file" accept="application/json,.json" hidden>
         </div>
       </header>
@@ -39,32 +39,32 @@
       </section>
 
       <section class="core-panel">
-        <div class="panel-title">過去の出来事から見えてきたこと</div>
+        <div class="panel-title">小さく動くために見えてきたこと</div>
         <textarea
           id="coreText"
           class="core-text"
-          aria-label="過去の出来事から見えてきたこと"
-          placeholder="例: 失敗そのものより、「ちゃんとできない自分はだめだ」と見ていることが苦しさを強めている。"
+          aria-label="小さく動くために見えてきたこと"
+          placeholder="例: 気分を変えてから動くより、10秒だけ手をつける方が戻りやすい。"
         ></textarea>
       </section>
 
       <section class="writing-guide" aria-label="書き方の参考">
         <div class="guide-head">
           <strong>書き方の参考</strong>
-          <span>過去の出来事から始めて、気持ち、思い込み、価値観を見つけて、小さく試す。</span>
+          <span>過去の出来事をほどいて、最後は今すぐできる10秒から3分の行動にする。</span>
         </div>
         <div class="guide-strip">
-          <p><b>過去の出来事</b><span>会議で言いたいことを飲み込んだ</span></p>
+          <p><b>過去の出来事</b><span>資料を開く前にスマホを見続けた</span></p>
           <i aria-hidden="true">→</i>
-          <p><b>気持ち</b><span>胸が詰まる、怖い、あとで悔しい</span></p>
+          <p><b>気持ち</b><span>重い、失敗しそう、始めるのが怖い</span></p>
           <i aria-hidden="true">→</i>
-          <p><b>思い込み</b><span>変なことを言うと、場を壊してしまう</span></p>
+          <p><b>思い込み</b><span>ちゃんと進められないなら触らない方がいい</span></p>
           <i aria-hidden="true">→</i>
-          <p><b>価値観</b><span>迷惑をかけない自分でいないといけない</span></p>
+          <p><b>価値観</b><span>中途半端な自分はだめだ</span></p>
           <i aria-hidden="true">→</i>
-          <p><b>新しい価値観</b><span>小さく意見を出すことも、場への参加になる</span></p>
+          <p><b>新しい価値観</b><span>10秒戻るだけでも、流れは作れる</span></p>
           <i aria-hidden="true">→</i>
-          <p><b>試す行動</b><span>次の会議で一度だけ質問をする</span></p>
+          <p><b>試す行動</b><span>資料を開いて、タイトルだけ読む</span></p>
         </div>
       </section>
 
@@ -165,7 +165,7 @@
         <p class="experiment-kicker">行動中</p>
         <h2 id="overlayPracticeText"></h2>
         <div class="overlay-timer" id="overlayTimer">00:00</div>
-        <p class="overlay-note">成果ではなく、やってみた時の感覚を観察する</p>
+        <p class="overlay-note">成果ではなく、手をつけた時の感覚を観察する</p>
         <button class="overlay-end" id="overlayEnd" type="button">終了して振り返る</button>
       </div>
     </section>
