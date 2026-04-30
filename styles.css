@@ -82,6 +82,12 @@ button:disabled {
   padding: 14px;
 }
 
+.title-area {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .eyebrow {
   margin: 0 0 5px;
   color: var(--practice);
@@ -118,6 +124,32 @@ h1 span {
   font-size: 12px;
   font-weight: 750;
   white-space: nowrap;
+}
+
+.language-switch {
+  min-height: 34px;
+  display: grid;
+  grid-template-columns: repeat(3, 34px);
+  border: 1px solid #d7dce3;
+  border-radius: 999px;
+  background: #ffffff;
+  flex: 0 0 auto;
+  margin-top: 2px;
+  padding: 3px;
+}
+
+.language-switch button {
+  min-width: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 780;
+}
+
+.language-switch button.active {
+  background: var(--practice);
+  color: #ffffff;
 }
 
 .button {
@@ -947,6 +979,12 @@ h1 span {
     padding: 12px 10px;
   }
 
+  .title-area {
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
   h1 {
     font-size: 22px;
     max-width: 12em;
@@ -963,6 +1001,11 @@ h1 span {
     min-height: 38px;
     padding: 0 6px;
     white-space: nowrap;
+  }
+
+  .language-switch {
+    grid-template-columns: repeat(3, 30px);
+    min-height: 32px;
   }
 
   .actions .save-status {

@@ -13,32 +13,368 @@ const LEGACY_STORAGE_KEYS = [
 
 const typeOrder = ["action", "branch", "premise", "core", "value", "practice"];
 
-const typeLabels = {
-  action: "過去の出来事",
-  branch: "気持ち",
-  premise: "思い込み",
-  core: "価値観",
-  value: "新しい価値観",
-  practice: "試す行動",
+const LANGUAGE_KEY = "self-map-language";
+const LANGUAGE_MODE_KEY = "self-map-language-mode";
+const dictionaries = {
+  ja: {
+    lang: "ja",
+    titleFull: "自己理解と思考整理 - Self Map：迷わず動くためのノート",
+    eyebrow: "自己理解と思考整理",
+    titleLead: "Self Map：",
+    titleMain: "迷わず動くためのノート",
+    typeLabels: {
+      action: "過去の出来事",
+      branch: "気持ち",
+      premise: "思い込み",
+      core: "価値観",
+      value: "新しい価値観",
+      practice: "試す行動",
+    },
+    writingPrompts: {
+      action: "例: 資料を開く前にスマホを見続けた",
+      branch: "例: 重い、失敗しそう、始めるのが怖い",
+      premise: "例: ちゃんと進められないなら触らない方がいい",
+      core: "例: 中途半端な自分はだめだ",
+      value: "例: 10秒戻るだけでも、流れは作れる",
+      practice: "例: 資料を開いて、タイトルだけ読む",
+    },
+    writingQuestions: {
+      action: "何が起きた？ 自分は何をした／しなかった？",
+      branch: "その直後、体や気持ちはどう反応した？",
+      premise: "その気持ちの奥に、どんな決めつけがありそう？",
+      core: "今までの自分は、どんな価値観（ものさし）でこれを見ていた？",
+      value: "これからは、どんな見方を試してみたい？",
+      practice: "今すぐできる最初の一歩にすると？",
+    },
+    guideLead: "過去の出来事から始めて、最後は今すぐできる小さな行動にする。",
+    guideSteps: [
+      ["過去の出来事", "さっき気になった場面を1つだけ書く"],
+      ["気持ち", "重い、怖い、焦るなどをそのまま書く"],
+      ["思い込み", "「ちゃんとしないとだめ」などの決めつけを書く"],
+      ["価値観", "本当は何を大事にしたかったかを書く"],
+      ["新しい価値観", "今の自分に合う言い方へ言い換える"],
+      ["試す行動", "今すぐできる最初の一歩にする"],
+    ],
+    ui: {
+      saved: "保存済み",
+      export: "書き出し",
+      import: "読み込み",
+      reset: "初期化",
+      writingGuide: "書き方の参考",
+      entryPanel: "振り返る場面",
+      deleteEntry: "場面を削除",
+      newEntry: "場面を追加",
+      newEntryName: "新しい場面",
+      entryName: "場面の名前",
+      board: "整理ボード",
+      connect: "つなぐ",
+      delete: "削除",
+      nextWrite: "次を書く",
+      startAction: "今すぐ行動開始",
+      endAction: "行動を終える",
+      startExperiment: "行動開始",
+      running: "行動中",
+      endExperiment: "終了",
+      previous: "前回",
+      howWasIt: "どうだった？",
+      done: "できた",
+      partial: "少しできた",
+      notDone: "できなかった",
+      memoOpen: "必要ならメモ",
+      memoClose: "メモを閉じる",
+      resultLabel: "実際に何をした？",
+      nextLabel: "次はどう調整する？",
+      applyValue: "新しい価値観へ反映",
+      quickTitle: "今から何をする？",
+      quickLead: "すぐ始められる形にする",
+      quickExamplesLabel: "行動の例",
+      quickExamples: ["開いて、最初の1行だけ見る", "宛先だけ開く", "目の前の1つだけ動かす"],
+      quickPlaceholder: "例: 途切れたら、責める前に1分だけ再開する",
+      close: "閉じる",
+      startWithThis: "この内容で開始",
+      installTitle: "ホーム画面に追加できます",
+      installBody: "すぐ開けるように、アプリのように使えます。",
+      add: "追加",
+      firstActionPlaceholder: "例: さっき気になった場面をそのまま書く。うまく書こうとしなくてOK。",
+      emptyPlaceholder: "ここに書く",
+      emptyCard: "未入力のカード",
+      connectStatus: "接続中: {type}「{preview}」とつなぐ相手を選ぶ",
+      chooseConnectTarget: "つなぐ相手を選んでください",
+      disconnect: "接続を解除しました",
+      installFromMenu: "ブラウザのメニューからホーム画面に追加できます",
+      resetConfirm: "初期例に戻しますか？ 今の内容は上書きされます。必要なら先に書き出してください。",
+      exported: "書き出しました",
+      imported: "読み込みました",
+      importFailed: "読み込み失敗",
+      importFailedAlert: "読み込めませんでした。書き出したJSONファイルを選んでください。",
+      cannotDeleteLastEntry: "最後の場面は削除できません。初期例に戻すか、内容を書き換えて使ってください。",
+      deleteEntryConfirm: "この場面を削除しますか？元に戻せません。",
+      reflectionSaved: "振り返りを保存しました",
+      reflectionFirst: "振り返りを先に書いてください",
+      valueApplied: "新しい価値観に反映しました",
+      actionCardReady: "行動内容を書けるカードを用意しました",
+      actionAlreadyRunning: "行動中のカードがあります",
+      writeActionFirst: "行動内容を書いてから開始できます",
+      shrinkHint: "大きいかも。10秒でできる形にする？",
+      shrinkButton: "もっと小さくする",
+      valueReflectionText: "やってみて調整できる。まず小さく戻ればいい。",
+      overlayNote: "完璧でなくてOK。終わったら気づきを残そう。",
+      overlayEnd: "終了して振り返る",
+      startPoint: "起点にする",
+    },
+  },
+  en: {
+    lang: "en",
+    titleFull: "Self-understanding and Thought Sorting - Self Map: A note for moving without hesitation",
+    eyebrow: "Self-understanding and thought sorting",
+    titleLead: "Self Map:",
+    titleMain: "A note for moving without hesitation",
+    typeLabels: {
+      action: "Past Event",
+      branch: "Feeling",
+      premise: "Assumption",
+      core: "Value",
+      value: "New Value",
+      practice: "Action to Try",
+    },
+    writingPrompts: {
+      action: "Example: I kept looking at my phone before opening the document",
+      branch: "Example: Heavy, scared to fail, afraid to start",
+      premise: "Example: If I cannot do it properly, I should not touch it",
+      core: "Example: I am not good enough if I do things halfway",
+      value: "Example: Even returning for a moment can restart the flow",
+      practice: "Example: Open the document and read only the title",
+    },
+    writingQuestions: {
+      action: "What happened? What did you do or avoid doing?",
+      branch: "How did your body or feelings react right after that?",
+      premise: "What hidden assumption might be behind that feeling?",
+      core: "What value or rule were you using to see this?",
+      value: "What new way of seeing this would you like to try?",
+      practice: "What is the first step you can do right now?",
+    },
+    guideLead: "Start from a past event and end with one small action you can do now.",
+    guideSteps: [
+      ["Past Event", "Write one scene that caught your attention"],
+      ["Feeling", "Write the raw feeling: heavy, scared, rushed"],
+      ["Assumption", "Write the rule you may be holding"],
+      ["Value", "Write what you actually wanted to care about"],
+      ["New Value", "Rephrase it into words that fit you now"],
+      ["Action to Try", "Make it the first step you can do now"],
+    ],
+    ui: {
+      saved: "Saved",
+      export: "Export",
+      import: "Import",
+      reset: "Reset",
+      writingGuide: "Writing guide",
+      entryPanel: "Scenes to reflect on",
+      deleteEntry: "Delete scene",
+      newEntry: "Add scene",
+      newEntryName: "New scene",
+      entryName: "Scene name",
+      board: "Sorting board",
+      connect: "Connect",
+      delete: "Delete",
+      nextWrite: "Next",
+      startAction: "Start action now",
+      endAction: "End action",
+      startExperiment: "Start action",
+      running: "In action",
+      endExperiment: "Finish",
+      previous: "Previous",
+      howWasIt: "How did it go?",
+      done: "Done",
+      partial: "A little",
+      notDone: "Not done",
+      memoOpen: "Add note",
+      memoClose: "Close note",
+      resultLabel: "What did you actually do?",
+      nextLabel: "How will you adjust next time?",
+      applyValue: "Apply to new value",
+      quickTitle: "What will you do now?",
+      quickLead: "Make it easy to start",
+      quickExamplesLabel: "Action examples",
+      quickExamples: ["Open it and read the first line", "Open only the recipient", "Move just one thing nearby"],
+      quickPlaceholder: "Example: Restart for one minute before blaming myself",
+      close: "Close",
+      startWithThis: "Start with this",
+      installTitle: "Add to home screen",
+      installBody: "Use it like an app and open it quickly.",
+      add: "Add",
+      firstActionPlaceholder: "Example: Write the scene that just bothered you. It does not need to be perfect.",
+      emptyPlaceholder: "Write here",
+      emptyCard: "Empty card",
+      connectStatus: "Connecting: choose a card to connect with {type} “{preview}”",
+      chooseConnectTarget: "Choose a card to connect",
+      disconnect: "Connection removed",
+      installFromMenu: "You can add this from your browser menu",
+      resetConfirm: "Reset to the sample? Your current notes will be overwritten. Export first if needed.",
+      exported: "Exported",
+      imported: "Imported",
+      importFailed: "Import failed",
+      importFailedAlert: "Could not import it. Choose a JSON file exported from this app.",
+      cannotDeleteLastEntry: "The last scene cannot be deleted. Reset to the sample or rewrite it.",
+      deleteEntryConfirm: "Delete this scene? This cannot be undone.",
+      reflectionSaved: "Reflection saved",
+      reflectionFirst: "Write the reflection first",
+      valueApplied: "Applied to the new value",
+      actionCardReady: "Prepared a card for your action",
+      actionAlreadyRunning: "Another action is already running",
+      writeActionFirst: "Write the action before starting",
+      shrinkHint: "This may be too big. Make it doable in 10 seconds?",
+      shrinkButton: "Make smaller",
+      valueReflectionText: "I can adjust after trying. First, return in a small way.",
+      overlayNote: "It does not need to be perfect. Leave a note when you finish.",
+      overlayEnd: "Finish and reflect",
+      startPoint: "Start point",
+    },
+  },
+  zh: {
+    lang: "zh-Hans",
+    titleFull: "自我理解与思考整理 - Self Map：帮助你不再犹豫的笔记",
+    eyebrow: "自我理解与思考整理",
+    titleLead: "Self Map：",
+    titleMain: "帮助你不再犹豫的笔记",
+    typeLabels: {
+      action: "过去的事件",
+      branch: "感受",
+      premise: "固有想法",
+      core: "价值观",
+      value: "新的价值观",
+      practice: "尝试行动",
+    },
+    writingPrompts: {
+      action: "例：打开资料前一直在看手机",
+      branch: "例：沉重、怕失败、不敢开始",
+      premise: "例：如果不能好好做，就不要碰",
+      core: "例：半途而废的自己是不行的",
+      value: "例：只要回来一点点，也能重新开始",
+      practice: "例：打开资料，只读标题",
+    },
+    writingQuestions: {
+      action: "发生了什么？你做了什么，或没有做什么？",
+      branch: "之后身体或心情有什么反应？",
+      premise: "这种感受背后，可能有什么固定想法？",
+      core: "你当时用什么价值观或标准看待这件事？",
+      value: "接下来想尝试用什么新的看法？",
+      practice: "现在可以做的第一小步是什么？",
+    },
+    guideLead: "从过去的事件开始，最后变成一个现在就能做的小行动。",
+    guideSteps: [
+      ["过去的事件", "写下刚才在意的一个场景"],
+      ["感受", "直接写沉重、害怕、焦急等感受"],
+      ["固有想法", "写下可能卡住自己的判断"],
+      ["价值观", "写下自己真正想重视的东西"],
+      ["新的价值观", "换成更适合现在自己的说法"],
+      ["尝试行动", "变成现在就能做的第一步"],
+    ],
+    ui: {
+      saved: "已保存",
+      export: "导出",
+      import: "导入",
+      reset: "重置",
+      writingGuide: "写法参考",
+      entryPanel: "回顾场景",
+      deleteEntry: "删除场景",
+      newEntry: "添加场景",
+      newEntryName: "新场景",
+      entryName: "场景名称",
+      board: "整理看板",
+      connect: "连接",
+      delete: "删除",
+      nextWrite: "下一步",
+      startAction: "现在开始行动",
+      endAction: "结束行动",
+      startExperiment: "开始行动",
+      running: "行动中",
+      endExperiment: "结束",
+      previous: "上次",
+      howWasIt: "结果如何？",
+      done: "做到了",
+      partial: "做了一点",
+      notDone: "没做到",
+      memoOpen: "需要的话写备注",
+      memoClose: "关闭备注",
+      resultLabel: "实际做了什么？",
+      nextLabel: "下次怎么调整？",
+      applyValue: "反映到新的价值观",
+      quickTitle: "现在要做什么？",
+      quickLead: "改成容易开始的形式",
+      quickExamplesLabel: "行动例子",
+      quickExamples: ["打开它，只读第一行", "只打开收件人", "只移动眼前的一个东西"],
+      quickPlaceholder: "例：责备自己之前，先重新开始1分钟",
+      close: "关闭",
+      startWithThis: "用这个开始",
+      installTitle: "可以添加到主屏幕",
+      installBody: "像应用一样快速打开。",
+      add: "添加",
+      firstActionPlaceholder: "例：直接写下刚才在意的场景。不需要写得完美。",
+      emptyPlaceholder: "在这里写",
+      emptyCard: "空卡片",
+      connectStatus: "连接中：选择要和{type}「{preview}」连接的卡片",
+      chooseConnectTarget: "请选择要连接的卡片",
+      disconnect: "已取消连接",
+      installFromMenu: "可以从浏览器菜单添加到主屏幕",
+      resetConfirm: "恢复为示例吗？当前内容会被覆盖。需要的话请先导出。",
+      exported: "已导出",
+      imported: "已导入",
+      importFailed: "导入失败",
+      importFailedAlert: "无法导入。请选择从本应用导出的 JSON 文件。",
+      cannotDeleteLastEntry: "最后一个场景不能删除。请恢复示例或直接改写内容。",
+      deleteEntryConfirm: "删除这个场景吗？此操作无法撤销。",
+      reflectionSaved: "回顾已保存",
+      reflectionFirst: "请先写回顾",
+      valueApplied: "已反映到新的价值观",
+      actionCardReady: "已准备好可写行动内容的卡片",
+      actionAlreadyRunning: "已有行动正在进行中",
+      writeActionFirst: "请先写行动内容再开始",
+      shrinkHint: "可能太大了。要改成10秒能做的形式吗？",
+      shrinkButton: "变得更小",
+      valueReflectionText: "试过之后可以再调整。先小小地回到行动。",
+      overlayNote: "不需要完美。结束后留下发现就好。",
+      overlayEnd: "结束并回顾",
+      startPoint: "作为起点",
+    },
+  },
 };
 
-const writingPrompts = {
-  action: "例: 資料を開く前にスマホを見続けた",
-  branch: "例: 重い、失敗しそう、始めるのが怖い",
-  premise: "例: ちゃんと進められないなら触らない方がいい",
-  core: "例: 中途半端な自分はだめだ",
-  value: "例: 10秒戻るだけでも、流れは作れる",
-  practice: "例: 資料を開いて、タイトルだけ読む",
-};
+let currentLanguage = getInitialLanguage();
+if (!dictionaries[currentLanguage]) currentLanguage = "ja";
+let typeLabels = dictionaries.ja.typeLabels;
+let writingPrompts = dictionaries.ja.writingPrompts;
+let writingQuestions = dictionaries.ja.writingQuestions;
 
-const writingQuestions = {
-  action: "何が起きた？ 自分は何をした／しなかった？",
-  branch: "その直後、体や気持ちはどう反応した？",
-  premise: "その気持ちの奥に、どんな決めつけがありそう？",
-  core: "今までの自分は、どんな価値観（ものさし）でこれを見ていた？",
-  value: "これからは、どんな見方を試してみたい？",
-  practice: "今すぐできる最初の一歩にすると？",
-};
+function dict() {
+  return dictionaries[currentLanguage] ?? dictionaries.ja;
+}
+
+function ui(key) {
+  return dict().ui[key] ?? dictionaries.ja.ui[key] ?? key;
+}
+
+function refreshLanguageResources() {
+  typeLabels = dict().typeLabels;
+  writingPrompts = dict().writingPrompts;
+  writingQuestions = dict().writingQuestions;
+}
+
+function detectInitialLanguage() {
+  const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
+  const language = languages.find(Boolean)?.toLowerCase() ?? "";
+  if (language.startsWith("ja")) return "ja";
+  if (language.startsWith("zh")) return "zh";
+  if (language.startsWith("en")) return "en";
+  return "en";
+}
+
+function getInitialLanguage() {
+  if (localStorage.getItem(LANGUAGE_MODE_KEY) !== "manual") return detectInitialLanguage();
+  const savedLanguage = localStorage.getItem(LANGUAGE_KEY);
+  return dictionaries[savedLanguage] ? savedLanguage : detectInitialLanguage();
+}
+
+refreshLanguageResources();
 
 const defaultState = {
   core:
@@ -97,6 +433,7 @@ let draggedId = null;
 let dropHandled = false;
 let linkingId = null;
 let pendingFocusId = null;
+let pendingScrollType = null;
 let timerId = null;
 let showArchivedEntries = false;
 let stepMode = false;
@@ -118,6 +455,7 @@ const nodeConfidence = document.querySelector("#nodeConfidence");
 const confidenceValue = document.querySelector("#confidenceValue");
 const saveStatus = document.querySelector("#saveStatus");
 const importFile = document.querySelector("#importFile");
+const languageButtons = document.querySelectorAll("[data-language]");
 const experimentOverlay = document.querySelector("#experimentOverlay");
 const overlayPracticeText = document.querySelector("#overlayPracticeText");
 const overlayTimer = document.querySelector("#overlayTimer");
@@ -144,6 +482,9 @@ dismissInstall.addEventListener("click", dismissInstallPrompt);
 document.querySelector("#exportData").addEventListener("click", exportData);
 document.querySelector("#importData").addEventListener("click", () => importFile.click());
 document.querySelector("#resetDemo").addEventListener("click", resetDemo);
+languageButtons.forEach((button) => {
+  button.addEventListener("click", () => setLanguage(button.dataset.language));
+});
 document.querySelector("#addChild").addEventListener("click", () => {
   const selected = findNode(state.selectedId);
   if (selected) addNode(selected.id, childTypeFor(selected.type));
@@ -223,11 +564,90 @@ document.querySelectorAll(".lane-body").forEach((lane) => {
   });
 });
 
+applyStaticText();
 render();
 if (state.activeSessionId) startTimer();
 updateExperimentOverlay();
-setupQuickActionComposer();
 setupInstallPrompt();
+
+function setLanguage(language) {
+  currentLanguage = dictionaries[language] ? language : "ja";
+  localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+  localStorage.setItem(LANGUAGE_MODE_KEY, "manual");
+  refreshLanguageResources();
+  applyStaticText();
+  render();
+}
+
+function applyStaticText() {
+  const currentDict = dict();
+  document.documentElement.lang = currentDict.lang;
+  document.title = currentDict.titleFull;
+  languageButtons.forEach((button) => {
+    const isActive = button.dataset.language === currentLanguage;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  setText(".eyebrow", currentDict.eyebrow);
+  const title = document.querySelector("h1");
+  if (title) {
+    title.replaceChildren();
+    const lead = document.createElement("span");
+    lead.textContent = currentDict.titleLead;
+    const main = document.createElement("span");
+    main.textContent = currentDict.titleMain;
+    title.append(lead, main);
+  }
+
+  setText("#saveStatus", ui("saved"));
+  setText("#exportData", ui("export"));
+  setText("#importData", ui("import"));
+  setText("#resetDemo", ui("reset"));
+  setText("#deleteEntry", ui("deleteEntry"));
+  setText("#newEntry", ui("newEntry"));
+  setText("#prevStep", currentLanguage === "en" ? "Back" : currentLanguage === "zh" ? "上一步" : "前へ");
+  setText("#nextStep", currentLanguage === "en" ? "Next" : currentLanguage === "zh" ? "下一步" : "次へ");
+  setText("#mobileStartAction", getActiveSession() ? ui("endAction") : ui("startAction"));
+  setText("#installApp", ui("add"));
+  setText("#dismissOnboarding", ui("close"));
+  setText(".guide-head strong", ui("writingGuide"));
+  setText(".guide-head span", currentDict.guideLead);
+  setText(".entry-tabs-head strong", ui("entryPanel"));
+  setText(".install-prompt strong", ui("installTitle"));
+  setText(".install-prompt span", ui("installBody"));
+  setText(".overlay-note", ui("overlayNote"));
+  setText("#overlayEnd", ui("overlayEnd"));
+
+  document.querySelector(".writing-guide")?.setAttribute("aria-label", ui("writingGuide"));
+  document.querySelector(".entry-tabs-panel")?.setAttribute("aria-label", ui("entryPanel"));
+  document.querySelector(".board")?.setAttribute("aria-label", ui("board"));
+  document.querySelector("#dismissInstall")?.setAttribute("aria-label", ui("close"));
+  renderGuideSteps();
+  updateNodeTypeOptions();
+  setupQuickActionComposer();
+}
+
+function setText(selector, text) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = text;
+}
+
+function renderGuideSteps() {
+  const steps = document.querySelectorAll(".guide-strip p");
+  dict().guideSteps.forEach(([title, body], index) => {
+    const step = steps[index];
+    if (!step) return;
+    step.querySelector("b").textContent = title;
+    step.querySelector("span").textContent = body;
+  });
+}
+
+function updateNodeTypeOptions() {
+  [...nodeType.options].forEach((option) => {
+    option.textContent = typeLabels[option.value] ?? option.textContent;
+  });
+}
 
 function loadAppState() {
   const raw = localStorage.getItem(STORAGE_KEY) ?? findLegacyState();
@@ -336,7 +756,7 @@ function normalizeState(rawState) {
         : null,
       result: typeof session.result === "string" ? session.result : "",
       feeling: typeof session.feeling === "string" ? session.feeling : "",
-      outcome: typeof session.outcome === "string" ? session.outcome : "",
+      outcome: normalizedOutcome(session.outcome || session.feeling),
       nextAction: typeof session.nextAction === "string" ? session.nextAction : "",
     }))
     .filter((session) => nodeIds.has(session.nodeId));
@@ -390,7 +810,7 @@ function showInstallPrompt() {
 
 async function installPwa() {
   if (!deferredInstallPrompt) {
-    showSaveStatus("ブラウザのメニューからホーム画面に追加できます");
+    showSaveStatus(ui("installFromMenu"));
     return;
   }
   deferredInstallPrompt.prompt();
@@ -451,19 +871,19 @@ function normalizeParentIds(node) {
 function saveState() {
   state.updatedAt = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-  showSaveStatus("保存済み");
+  showSaveStatus(ui("saved"));
 }
 
 function showSaveStatus(message) {
   saveStatus.textContent = message;
   window.clearTimeout(showSaveStatus.timeoutId);
   showSaveStatus.timeoutId = window.setTimeout(() => {
-    saveStatus.textContent = "保存済み";
+    saveStatus.textContent = ui("saved");
   }, 1800);
 }
 
 function resetDemo() {
-  if (!confirm("初期例に戻しますか？ 今の内容は上書きされます。必要なら先に書き出してください。")) {
+  if (!confirm(ui("resetConfirm"))) {
     return;
   }
   appState = createAppStateFromEntry(structuredClone(defaultState));
@@ -489,7 +909,7 @@ function exportData() {
   anchor.download = `self-map-${date}.json`;
   anchor.click();
   URL.revokeObjectURL(url);
-  showSaveStatus("書き出しました");
+  showSaveStatus(ui("exported"));
 }
 
 function importData(event) {
@@ -504,10 +924,10 @@ function importData(event) {
       appState = normalizeAppState(parsed);
       state = getActiveEntry();
       saveAndRender();
-      showSaveStatus("読み込みました");
+      showSaveStatus(ui("imported"));
     } catch {
-      showSaveStatus("読み込み失敗");
-      alert("読み込めませんでした。書き出したJSONファイルを選んでください。");
+      showSaveStatus(ui("importFailed"));
+      alert(ui("importFailedAlert"));
     }
   });
   reader.readAsText(file);
@@ -538,12 +958,13 @@ function render() {
   }
 
   if (mobileStartAction) {
-    mobileStartAction.textContent = getActiveSession() ? "行動を終える" : "今すぐ行動開始";
+    mobileStartAction.textContent = getActiveSession() ? ui("endAction") : ui("startAction");
   }
 
   renderEditor();
   requestAnimationFrame(() => {
     drawLinks();
+    scrollPendingLane();
     focusPendingNode();
   });
 }
@@ -559,7 +980,7 @@ function renderEntryTabs() {
     const name = document.createElement("input");
     name.className = "entry-title-input";
     name.value = deriveEntryTitle(entry);
-    name.setAttribute("aria-label", "場面の名前");
+    name.setAttribute("aria-label", ui("entryName"));
     name.addEventListener("focus", () => switchEntry(entry.id));
     name.addEventListener("input", () => {
       entry.customTitle = name.value;
@@ -590,7 +1011,7 @@ function createEntry() {
     activeSessionId: null,
     sessions: [],
     nodes: [],
-    customTitle: "新しい場面",
+    customTitle: ui("newEntryName"),
     createdAt: Date.now(),
     updatedAt: Date.now(),
   });
@@ -602,10 +1023,10 @@ function createEntry() {
 
 function deleteCurrentEntry() {
   if (appState.entries.length <= 1) {
-    alert("最後の場面は削除できません。初期例に戻すか、内容を書き換えて使ってください。");
+    alert(ui("cannotDeleteLastEntry"));
     return;
   }
-  if (!confirm("この場面を削除しますか？元に戻せません。")) return;
+  if (!confirm(ui("deleteEntryConfirm"))) return;
   const deletingId = state.id;
   appState.entries = appState.entries.filter((entry) => entry.id !== deletingId);
   appState.activeEntryId = getVisibleEntries()[0]?.id ?? appState.entries[0].id;
@@ -628,7 +1049,7 @@ function deriveEntryTitle(entry) {
   if (entry.customTitle?.trim()) return entry.customTitle.trim();
   const actionText = entry.nodes?.find((node) => node.type === "action" && node.text.trim())?.text.trim();
   if (actionText) return actionText.slice(0, 28);
-  return "新しい場面";
+  return ui("newEntryName");
 }
 
 function formatEntryDate(timestamp) {
@@ -688,8 +1109,10 @@ function updateConnectionStatus() {
     connectionStatus.textContent = "";
     return;
   }
-  const preview = source.text.trim() || writingPrompts[source.type] || "未入力のカード";
-  connectionStatus.textContent = `接続中: ${typeLabels[source.type]}「${preview.slice(0, 28)}」とつなぐ相手を選ぶ`;
+  const preview = source.text.trim() || writingPrompts[source.type] || ui("emptyCard");
+  connectionStatus.textContent = ui("connectStatus")
+    .replace("{type}", typeLabels[source.type])
+    .replace("{preview}", preview.slice(0, 28));
 }
 
 function renderCard(node) {
@@ -702,9 +1125,11 @@ function renderCard(node) {
   card.classList.toggle("connected-target", Boolean(linkingId) && isConnectedTo(linkingId, node.id));
   card.querySelector(".type-label").textContent = typeLabels[node.type];
   card.querySelector(".card-question").textContent = writingQuestions[node.type];
+  card.querySelector(".card-link").textContent = ui("connect");
+  card.querySelector(".card-delete").textContent = ui("delete");
   const addButton = card.querySelector(".card-add");
-  addButton.textContent = node.type === "practice" ? "+" : "次を書く";
-  addButton.title = node.type === "practice" ? "add" : `次を書く: ${typeLabels[childTypeFor(node.type)]}`;
+  addButton.textContent = node.type === "practice" ? "+" : ui("nextWrite");
+  addButton.title = node.type === "practice" ? ui("add") : `${ui("nextWrite")}: ${typeLabels[childTypeFor(node.type)]}`;
 
   const textInput = card.querySelector(".card-text");
   textInput.placeholder = placeholderForNode(node);
@@ -816,9 +1241,9 @@ function placeholderForNode(node) {
     state.nodes.filter((candidate) => candidate.type === "action").length === 1 &&
     !node.text.trim()
   ) {
-    return "例: さっき気になった場面をそのまま書く。うまく書こうとしなくてOK。";
+    return ui("firstActionPlaceholder");
   }
-  return writingPrompts[node.type] ?? "ここに書く";
+  return writingPrompts[node.type] ?? ui("emptyPlaceholder");
 }
 
 function isPracticeTooLarge(text) {
@@ -831,8 +1256,8 @@ function renderShrinkHint(node, textInput) {
   const hint = document.createElement("section");
   hint.className = "shrink-hint";
   hint.innerHTML = `
-    <span>大きいかも。10秒でできる形にする？</span>
-    <button type="button">もっと小さくする</button>
+    <span>${escapeHtml(ui("shrinkHint"))}</span>
+    <button type="button">${escapeHtml(ui("shrinkButton"))}</button>
   `;
   hint.querySelector("button").addEventListener("click", (event) => {
     event.stopPropagation();
@@ -846,6 +1271,8 @@ function renderShrinkHint(node, textInput) {
 }
 
 function suggestSmallerPractice(text) {
+  if (currentLanguage === "en") return "Do the first 10 seconds only";
+  if (currentLanguage === "zh") return "先做最开始的10秒";
   if (/資料|書類|ファイル|画面/.test(text)) return "開いて、最初の1行だけ見る";
   if (/連絡|返信|メール|チャット/.test(text)) return "宛先だけ開く";
   if (/片付|掃除/.test(text)) return "目の前の1つだけ動かす";
@@ -862,7 +1289,7 @@ function renderPracticeTools(card, node) {
     const startButton = document.createElement("button");
     startButton.className = "experiment-start";
     startButton.type = "button";
-    startButton.textContent = "行動開始";
+    startButton.textContent = ui("startExperiment");
     startButton.disabled = Boolean(getActiveSession());
     startButton.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -876,12 +1303,12 @@ function renderPracticeTools(card, node) {
     running.className = "experiment-panel running";
     running.innerHTML = `
       <div class="experiment-row">
-        <span>行動中</span>
+        <span>${escapeHtml(ui("running"))}</span>
         <strong class="experiment-timer" data-session-id="${activeSession.id}">${formatDuration(
           elapsedSec(activeSession),
         )}</strong>
       </div>
-      <button class="experiment-end" type="button">終了</button>
+      <button class="experiment-end" type="button">${escapeHtml(ui("endExperiment"))}</button>
     `;
     running.querySelector(".experiment-end").addEventListener("click", (event) => {
       event.stopPropagation();
@@ -898,17 +1325,18 @@ function renderReflectionSummary(session) {
   const wrapper = document.createElement("section");
   wrapper.className = "experiment-panel compact";
   const isOpen = expandedReflections.has(session.id);
+  const outcome = normalizedOutcome(session.outcome);
   wrapper.innerHTML = `
     <div class="experiment-row">
-      <span>前回 ${formatDuration(session.durationSec ?? elapsedSec(session))}</span>
-      <strong>${session.outcome || "どうだった？"}</strong>
+      <span>${escapeHtml(ui("previous"))} ${formatDuration(session.durationSec ?? elapsedSec(session))}</span>
+      <strong>${escapeHtml(outcome ? outcomeLabel(outcome) : ui("howWasIt"))}</strong>
     </div>
-    <div class="reflection-outcomes" aria-label="行動の振り返り">
-      <button class="${session.outcome === "できた" ? "active" : ""}" type="button" data-outcome="できた">できた</button>
-      <button class="${session.outcome === "少しできた" ? "active" : ""}" type="button" data-outcome="少しできた">少しできた</button>
-      <button class="${session.outcome === "できなかった" ? "active" : ""}" type="button" data-outcome="できなかった">できなかった</button>
+    <div class="reflection-outcomes" aria-label="${escapeHtml(ui("howWasIt"))}">
+      <button class="${outcome === "done" ? "active" : ""}" type="button" data-outcome="done">${escapeHtml(ui("done"))}</button>
+      <button class="${outcome === "partial" ? "active" : ""}" type="button" data-outcome="partial">${escapeHtml(ui("partial"))}</button>
+      <button class="${outcome === "notDone" ? "active" : ""}" type="button" data-outcome="notDone">${escapeHtml(ui("notDone"))}</button>
     </div>
-    <button class="reflection-toggle" type="button">${isOpen ? "メモを閉じる" : "必要ならメモ"}</button>
+    <button class="reflection-toggle" type="button">${escapeHtml(isOpen ? ui("memoClose") : ui("memoOpen"))}</button>
   `;
 
   wrapper.querySelectorAll("[data-outcome]").forEach((button) => {
@@ -932,10 +1360,22 @@ function renderReflectionSummary(session) {
 }
 
 function setSessionOutcome(session, outcome) {
-  session.outcome = outcome;
-  session.feeling = outcome;
+  session.outcome = normalizedOutcome(outcome) || outcome;
+  session.feeling = outcomeLabel(session.outcome);
   saveAndRender();
-  showSaveStatus("振り返りを保存しました");
+  showSaveStatus(ui("reflectionSaved"));
+}
+
+function normalizedOutcome(outcome) {
+  if (["done", "できた", "Done", "做到了"].includes(outcome)) return "done";
+  if (["partial", "少しできた", "A little", "做了一点"].includes(outcome)) return "partial";
+  if (["notDone", "できなかった", "Not done", "没做到"].includes(outcome)) return "notDone";
+  return "";
+}
+
+function outcomeLabel(outcome) {
+  const key = normalizedOutcome(outcome);
+  return key ? ui(key) : "";
 }
 
 function renderReflection(session) {
@@ -943,14 +1383,14 @@ function renderReflection(session) {
   panel.className = "reflection-fields";
   panel.innerHTML = `
     <label>
-      実際に何をした？
+      ${escapeHtml(ui("resultLabel"))}
       <textarea class="session-result" rows="3"></textarea>
     </label>
     <label>
-      次はどう調整する？
+      ${escapeHtml(ui("nextLabel"))}
       <textarea class="session-next" rows="3"></textarea>
     </label>
-    <button class="reflection-apply" type="button">新しい価値観へ反映</button>
+    <button class="reflection-apply" type="button">${escapeHtml(ui("applyValue"))}</button>
   `;
 
   const result = panel.querySelector(".session-result");
@@ -977,14 +1417,14 @@ function renderReflection(session) {
 function applyReflectionToValue(session) {
   const sourceText = (session.nextAction || session.result || "").trim();
   if (!sourceText) {
-    showSaveStatus("振り返りを先に書いてください");
+    showSaveStatus(ui("reflectionFirst"));
     return;
   }
   const practice = findNode(session.nodeId);
   const parentValue = practice?.parentIds
     ?.map((id) => findNode(id))
     .find((node) => node?.type === "value");
-  const valueText = `やってみて調整できる。まず小さく戻ればいい。`;
+  const valueText = ui("valueReflectionText");
   if (parentValue) {
     parentValue.text = parentValue.text
       ? `${parentValue.text}\n${valueText}`
@@ -1002,7 +1442,7 @@ function applyReflectionToValue(session) {
     state.selectedId = node.id;
   }
   saveAndRender();
-  showSaveStatus("新しい価値観に反映しました");
+  showSaveStatus(ui("valueApplied"));
 }
 
 function drawLinks() {
@@ -1054,7 +1494,7 @@ function startLinking(id) {
   updateConnectionStatus();
   drawLinks();
   markLinkTargets();
-  showSaveStatus(linkingId ? "つなぐ相手を選んでください" : "接続を解除しました");
+  showSaveStatus(linkingId ? ui("chooseConnectTarget") : ui("disconnect"));
 }
 
 function markLinkTargets() {
@@ -1173,27 +1613,28 @@ function createPracticeNode() {
   state.nodes.push(node);
   state.selectedId = node.id;
   pendingFocusId = node.id;
+  pendingScrollType = node.type;
   saveAndRender();
   return node;
 }
 
 function setupQuickActionComposer() {
+  quickActionPanel?.remove();
   quickActionPanel = document.createElement("section");
   quickActionPanel.className = "quick-action-panel hidden";
+  const examples = ui("quickExamples");
   quickActionPanel.innerHTML = `
     <div>
-      <strong>今から何をする？</strong>
-      <span>すぐ始められる形にする</span>
+      <strong>${escapeHtml(ui("quickTitle"))}</strong>
+      <span>${escapeHtml(ui("quickLead"))}</span>
     </div>
-    <div class="quick-action-examples" aria-label="行動の例">
-      <button class="quick-action-example" type="button">開いて、最初の1行だけ見る</button>
-      <button class="quick-action-example" type="button">宛先だけ開く</button>
-      <button class="quick-action-example" type="button">目の前の1つだけ動かす</button>
+    <div class="quick-action-examples" aria-label="${escapeHtml(ui("quickExamplesLabel"))}">
+      ${examples.map((example) => `<button class="quick-action-example" type="button">${escapeHtml(example)}</button>`).join("")}
     </div>
-    <textarea class="quick-action-input" rows="3" placeholder="例: 途切れたら、責める前に1分だけ再開する"></textarea>
+    <textarea class="quick-action-input" rows="3" placeholder="${escapeHtml(ui("quickPlaceholder"))}"></textarea>
     <div class="quick-action-buttons">
-      <button class="button secondary quick-action-cancel" type="button">閉じる</button>
-      <button class="button primary quick-action-start" type="button">この内容で開始</button>
+      <button class="button secondary quick-action-cancel" type="button">${escapeHtml(ui("close"))}</button>
+      <button class="button primary quick-action-start" type="button">${escapeHtml(ui("startWithThis"))}</button>
     </div>
   `;
   quickActionInput = quickActionPanel.querySelector(".quick-action-input");
@@ -1253,7 +1694,7 @@ function startQuickActionFromComposer() {
   pendingFocusId = node.id;
   if (!node.text) {
     saveAndRender();
-    showSaveStatus("行動内容を書けるカードを用意しました");
+    showSaveStatus(ui("actionCardReady"));
     return;
   }
   closeQuickActionComposer();
@@ -1263,13 +1704,13 @@ function startQuickActionFromComposer() {
 
 function startSession(nodeId, options = {}) {
   if (getActiveSession()) {
-    showSaveStatus("行動中のカードがあります");
+    showSaveStatus(ui("actionAlreadyRunning"));
     return;
   }
   const node = findNode(nodeId);
   if (!options.allowEmpty && node?.type === "practice" && !node.text.trim()) {
     openQuickActionComposer(node);
-    showSaveStatus("行動内容を書いてから開始できます");
+    showSaveStatus(ui("writeActionFirst"));
     return;
   }
   const session = {
@@ -1366,7 +1807,7 @@ function updateExperimentOverlay() {
   if (!activeSession) return;
 
   const node = findNode(activeSession.nodeId);
-  const text = node?.text || "試す行動";
+  const text = node?.text || typeLabels.practice;
   overlayPracticeText.textContent = text;
   overlayPracticeText.className = overlayTextClass(text);
   overlayTimer.textContent = formatDuration(elapsedSec(activeSession));
@@ -1393,7 +1834,7 @@ function renderEditor() {
 
 function renderParentOptions(selected) {
   nodeParent.innerHTML = "";
-  nodeParent.append(new Option("起点にする", ""));
+  nodeParent.append(new Option(ui("startPoint"), ""));
   const parentType = previousType(selected.type);
 
   for (const node of state.nodes) {
@@ -1401,7 +1842,7 @@ function renderParentOptions(selected) {
     if (parentType && node.type !== parentType) continue;
     if (!parentType) continue;
     if (collectDescendants(selected.id).has(node.id)) continue;
-    const label = `${typeLabels[node.type]}: ${node.text || "未入力"}`;
+    const label = `${typeLabels[node.type]}: ${node.text || ui("emptyCard")}`;
     nodeParent.append(new Option(label.slice(0, 42), node.id));
   }
 
@@ -1461,6 +1902,7 @@ function addNode(parentId, type, options = {}) {
   }
   state.selectedId = node.id;
   pendingFocusId = node.id;
+  pendingScrollType = node.type;
   saveAndRender();
 }
 
@@ -1533,6 +1975,15 @@ function focusPendingNode() {
   if (!textInput) return;
   textInput.focus();
   textInput.select();
+}
+
+function scrollPendingLane() {
+  if (!pendingScrollType) return;
+  const lane = document.querySelector(`.lane[data-type="${pendingScrollType}"]`);
+  pendingScrollType = null;
+  if (!lane) return;
+  lane.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+  drawLinks();
 }
 
 // Final safety overrides.
