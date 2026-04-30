@@ -2830,3 +2830,39 @@ h1 {
     width: min(360px, calc(100vw - 48px));
   }
 }
+
+/* Mobile card controls: keep link/add/delete from colliding. */
+.card-tools {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-link {
+  grid-column: 1;
+}
+
+.card-add {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.card-delete {
+  grid-column: 3;
+  justify-self: end;
+}
+
+.card[data-type="practice"] .experiment-start {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  .card-link,
+  .card-add,
+  .card-delete {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+  }
+}

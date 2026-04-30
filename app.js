@@ -364,19 +364,17 @@ function hasCorruptedAppText(targetAppState) {
 
 function setupInstallPrompt() {
   if (localStorage.getItem("self-map-install-dismissed") === "1") return;
+  const isStandalone =
+    window.matchMedia?.("(display-mode: standalone)").matches ||
+    window.navigator.standalone;
+  if (isStandalone) return;
+
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
     showInstallPrompt();
   });
   window.addEventListener("appinstalled", dismissInstallPrompt);
-
-  const isStandalone =
-    window.matchMedia?.("(display-mode: standalone)").matches ||
-    window.navigator.standalone;
-  if (!isStandalone) {
-    window.setTimeout(showInstallPrompt, 1800);
-  }
 }
 
 function showInstallPrompt() {

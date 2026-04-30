@@ -1,12 +1,12 @@
 {
   "name": "Self Map",
   "short_name": "Self Map",
-  "description": "過去の出来事から、次に試す行動を見つける自己理解ツール。",
+  "description": "過去の出来事から、今すぐ試す小さな行動を見つける整理ノート。",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f4f6f1",
-  "theme_color": "#278a4e",
+  "background_color": "#faf9f7",
+  "theme_color": "#e44332",
   "orientation": "any",
   "icons": [
     {
