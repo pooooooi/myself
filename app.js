@@ -433,6 +433,7 @@ let draggedId = null;
 let dropHandled = false;
 let linkingId = null;
 let pendingFocusId = null;
+let pendingScrollId = null;
 let pendingScrollType = null;
 let timerId = null;
 let showArchivedEntries = false;
@@ -1613,6 +1614,7 @@ function createPracticeNode() {
   state.nodes.push(node);
   state.selectedId = node.id;
   pendingFocusId = node.id;
+  pendingScrollId = node.id;
   pendingScrollType = node.type;
   saveAndRender();
   return node;
@@ -1902,6 +1904,7 @@ function addNode(parentId, type, options = {}) {
   }
   state.selectedId = node.id;
   pendingFocusId = node.id;
+  pendingScrollId = node.id;
   pendingScrollType = node.type;
   saveAndRender();
 }
@@ -1973,16 +1976,35 @@ function focusPendingNode() {
   const textInput = document.querySelector(`[data-node-id="${pendingFocusId}"] .card-text`);
   pendingFocusId = null;
   if (!textInput) return;
-  textInput.focus();
+  textInput.focus({ preventScroll: true });
   textInput.select();
 }
 
 function scrollPendingLane() {
-  if (!pendingScrollType) return;
+  if (!pendingScrollType && !pendingScrollId) return;
+  const panel = document.querySelector(".map-panel");
   const lane = document.querySelector(`.lane[data-type="${pendingScrollType}"]`);
+  const card = pendingScrollId ? document.querySelector(`[data-node-id="${pendingScrollId}"]`) : null;
+  pendingScrollId = null;
   pendingScrollType = null;
-  if (!lane) return;
-  lane.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+  if (!panel || !lane) return;
+
+  const panelRect = panel.getBoundingClientRect();
+  const laneRect = lane.getBoundingClientRect();
+  const scrollPadding = 16;
+  const left = panel.scrollLeft + laneRect.left - panelRect.left - scrollPadding;
+  panel.scrollTo({
+    left: Math.max(0, left),
+    behavior: "smooth",
+  });
+
+  if (card) {
+    const cardTop = card.offsetTop - lane.offsetTop - 12;
+    lane.scrollTo({
+      top: Math.max(0, cardTop),
+      behavior: "smooth",
+    });
+  }
   drawLinks();
 }
 
