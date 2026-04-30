@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Self Map</string>
+    <string name="title_activity_main">Self Map</string>
+    <string name="package_name">com.poooooi.selfmap</string>
+    <string name="custom_url_scheme">com.poooooi.selfmap</string>
+</resources>

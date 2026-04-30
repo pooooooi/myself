@@ -1,0 +1,8 @@
+{
+  "appId": "com.poooooi.selfmap",
+  "appName": "Self Map",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

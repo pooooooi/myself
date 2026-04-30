@@ -1,0 +1,30 @@
+{
+  "name": "self-map",
+  "version": "1.0.0",
+  "description": "Small action reflection app",
+  "main": "app.js",
+  "scripts": {
+    "build": "node scripts/copy-web.js",
+    "cap:sync": "npm run build && cap sync",
+    "android:open": "npm run build && cap sync android && cap open android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pooooooi/myself.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/pooooooi/myself/issues"
+  },
+  "homepage": "https://github.com/pooooooi/myself#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/core": "^8.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.3.1"
+  }
+}
