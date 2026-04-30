@@ -1875,16 +1875,25 @@ function selectNode(id) {
 
 function deleteNode(id) {
   if (!id) return;
-  const removing = collectDescendants(id);
-  state.nodes = state.nodes.filter((node) => !removing.has(node.id));
-  state.sessions = state.sessions.filter((session) => !removing.has(session.nodeId));
+  const removing = new Set([id]);
+  const deletingIndex = state.nodes.findIndex((node) => node.id === id);
+  state.nodes = state.nodes
+    .filter((node) => node.id !== id)
+    .map((node) => ({
+      ...node,
+      parentIds: normalizeParentIds(node).filter((parentId) => parentId !== id),
+    }));
+  state.sessions = state.sessions.filter((session) => session.nodeId !== id);
   if (!state.sessions.some((session) => session.id === state.activeSessionId)) {
     state.activeSessionId = null;
     stopTimerIfIdle();
     updateExperimentOverlay();
   }
   if (linkingId && removing.has(linkingId)) linkingId = null;
-  state.selectedId = state.nodes[0]?.id ?? null;
+  state.selectedId =
+    state.nodes[Math.min(Math.max(deletingIndex, 0), state.nodes.length - 1)]?.id ??
+    state.nodes[0]?.id ??
+    null;
   saveAndRender();
 }
 
