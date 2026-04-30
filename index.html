@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#278a4e">
+    <meta name="theme-color" content="#e44332">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Self Map">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -18,189 +18,172 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">Self Map</p>
-          <h1>今すぐできる小さな行動に戻る</h1>
+          <h1>&#36855;&#12431;&#12378;&#21205;&#12367;&#12383;&#12417;&#12398;&#25972;&#29702;&#12494;&#12540;&#12488;</h1>
         </div>
         <div class="actions">
-          <span class="save-status" id="saveStatus">保存済み</span>
-          <button class="button secondary" id="exportData" type="button">書き出し</button>
-            <button class="button secondary" id="importData" type="button">読み込み</button>
-            <button class="button secondary" id="resetDemo" type="button">初期例</button>
-            <button class="button secondary" id="stepMode" type="button">1問いずつ</button>
-            <button class="button primary" id="addRoot" type="button">出来事を追加</button>
+          <span class="save-status" id="saveStatus">&#20445;&#23384;&#28168;&#12415;</span>
+          <button class="button secondary" id="exportData" type="button">&#26360;&#12365;&#20986;&#12375;</button>
+          <button class="button secondary" id="importData" type="button">&#35501;&#12415;&#36796;&#12415;</button>
+          <button class="button secondary" id="resetDemo" type="button">&#21021;&#26399;&#21270;</button>
           <input id="importFile" type="file" accept="application/json,.json" hidden>
         </div>
       </header>
 
-      <section class="entry-tabs-panel" aria-label="出来事タブ">
+      <section class="writing-guide" aria-label="&#26360;&#12365;&#26041;&#12398;&#21442;&#32771;">
+        <div class="guide-head">
+          <strong>&#26360;&#12365;&#26041;&#12398;&#21442;&#32771;</strong>
+          <span>&#36942;&#21435;&#12398;&#20986;&#26469;&#20107;&#12363;&#12425;&#22987;&#12417;&#12390;&#12289;&#26368;&#24460;&#12399;&#20170;&#12377;&#12368;&#12391;&#12365;&#12427;&#23567;&#12373;&#12394;&#34892;&#21205;&#12395;&#12377;&#12427;&#12290;</span>
+        </div>
+        <div class="onboarding-guide hidden" id="onboardingGuide" aria-live="polite">
+          <strong>&#12399;&#12376;&#12417;&#26041;</strong>
+          <ol>
+            <li>&#36942;&#21435;&#12398;&#20986;&#26469;&#20107;&#12434;1&#12388;&#26360;&#12367;</li>
+            <li>&#27671;&#25345;&#12385;&#12420;&#24605;&#12356;&#36796;&#12415;&#12434;&#30701;&#12367;&#12388;&#12394;&#12370;&#12427;</li>
+            <li>&#26368;&#24460;&#12395;&#12300;&#20170;&#12377;&#12368;&#34892;&#21205;&#38283;&#22987;&#12301;&#12434;&#25276;&#12379;&#12427;&#12367;&#12425;&#12356;&#23567;&#12373;&#12367;&#12377;&#12427;</li>
+          </ol>
+          <button class="button secondary" id="dismissOnboarding" type="button">&#38281;&#12376;&#12427;</button>
+        </div>
+        <div class="guide-strip">
+          <p><b>&#36942;&#21435;&#12398;&#20986;&#26469;&#20107;</b><span>&#12373;&#12387;&#12365;&#27671;&#12395;&#12394;&#12387;&#12383;&#22580;&#38754;&#12434;1&#12388;&#12384;&#12369;&#26360;&#12367;</span></p>
+          <i aria-hidden="true">-&gt;</i>
+          <p><b>&#27671;&#25345;&#12385;</b><span>&#37325;&#12356;&#12289;&#24598;&#12356;&#12289;&#28966;&#12427;&#12394;&#12393;&#12434;&#12381;&#12398;&#12414;&#12414;&#26360;&#12367;</span></p>
+          <i aria-hidden="true">-&gt;</i>
+          <p><b>&#24605;&#12356;&#36796;&#12415;</b><span>&#12300;&#12385;&#12419;&#12435;&#12392;&#12375;&#12394;&#12356;&#12392;&#12384;&#12417;&#12301;&#12394;&#12393;&#12398;&#27770;&#12417;&#12388;&#12369;&#12434;&#26360;&#12367;</span></p>
+          <i aria-hidden="true">-&gt;</i>
+          <p><b>&#20385;&#20516;&#35251;</b><span>&#26412;&#24403;&#12399;&#20309;&#12434;&#22823;&#20107;&#12395;&#12375;&#12383;&#12363;&#12387;&#12383;&#12363;&#12434;&#26360;&#12367;</span></p>
+          <i aria-hidden="true">-&gt;</i>
+          <p><b>&#26032;&#12375;&#12356;&#20385;&#20516;&#35251;</b><span>&#20170;&#12398;&#33258;&#20998;&#12395;&#21512;&#12358;&#35328;&#12356;&#26041;&#12408;&#35328;&#12356;&#25563;&#12360;&#12427;</span></p>
+          <i aria-hidden="true">-&gt;</i>
+          <p><b>&#35430;&#12377;&#34892;&#21205;</b><span>&#20170;&#12377;&#12368;&#12391;&#12365;&#12427;&#26368;&#21021;&#12398;&#19968;&#27497;&#12395;&#12377;&#12427;</span></p>
+        </div>
+      </section>
+
+      <section class="entry-tabs-panel" aria-label="&#25391;&#12426;&#36820;&#12427;&#22580;&#38754;">
         <div class="entry-tabs-head">
-          <strong>出来事</strong>
+          <strong>&#25391;&#12426;&#36820;&#12427;&#22580;&#38754;</strong>
           <div class="entry-actions">
-            <button class="button secondary" id="toggleArchived" type="button">保管を見る</button>
-            <button class="button secondary" id="archiveEntry" type="button">保管</button>
-            <button class="button danger" id="deleteEntry" type="button">削除</button>
-            <button class="button primary" id="newEntry" type="button">新しい出来事</button>
+            <button class="button danger" id="deleteEntry" type="button">&#22580;&#38754;&#12434;&#21066;&#38500;</button>
+            <button class="button primary" id="newEntry" type="button">&#22580;&#38754;&#12434;&#36861;&#21152;</button>
           </div>
         </div>
         <div class="entry-tabs" id="entryTabs"></div>
       </section>
 
-      <section class="core-panel">
-        <div class="panel-title">小さく動くために見えてきたこと</div>
-        <textarea
-          id="coreText"
-          class="core-text"
-          aria-label="小さく動くために見えてきたこと"
-          placeholder="例: 気分を変えてから動くより、10秒だけ手をつける方が戻りやすい。"
-        ></textarea>
-      </section>
+      <textarea id="coreText" hidden></textarea>
 
-      <section class="writing-guide" aria-label="書き方の参考">
-        <div class="guide-head">
-          <strong>書き方の参考</strong>
-          <span>過去の出来事をほどいて、最後は今すぐできる10秒から3分の行動にする。</span>
-        </div>
-        <div class="guide-strip">
-          <p><b>過去の出来事</b><span>資料を開く前にスマホを見続けた</span></p>
-          <i aria-hidden="true">→</i>
-          <p><b>気持ち</b><span>重い、失敗しそう、始めるのが怖い</span></p>
-          <i aria-hidden="true">→</i>
-          <p><b>思い込み</b><span>ちゃんと進められないなら触らない方がいい</span></p>
-          <i aria-hidden="true">→</i>
-          <p><b>価値観</b><span>中途半端な自分はだめだ</span></p>
-          <i aria-hidden="true">→</i>
-          <p><b>新しい価値観</b><span>10秒戻るだけでも、流れは作れる</span></p>
-          <i aria-hidden="true">→</i>
-          <p><b>試す行動</b><span>資料を開いて、タイトルだけ読む</span></p>
-        </div>
-      </section>
-
-      <section class="board" aria-label="自己理解ボード">
-        <section class="step-controls hidden" id="stepControls" aria-label="1問いずつ進む">
-          <button class="button secondary" id="prevStep" type="button">前へ</button>
+      <section class="board" aria-label="&#25972;&#29702;&#12508;&#12540;&#12489;">
+        <section class="step-controls hidden" id="stepControls" aria-label="hidden">
+          <button class="button secondary" id="prevStep" type="button">&#21069;&#12408;</button>
           <span id="stepLabel"></span>
-          <button class="button primary" id="nextStep" type="button">次へ</button>
+          <button class="button primary" id="nextStep" type="button">&#27425;&#12408;</button>
         </section>
         <section class="map-panel">
-          <div class="connection-status hidden" id="connectionStatus"></div>
+          <div class="map-status-row">
+            <div class="connection-status hidden" id="connectionStatus"></div>
+          </div>
           <svg class="links" id="links" aria-hidden="true"></svg>
           <div class="columns" id="columns">
             <section class="lane" data-type="action">
               <header>
-                <span>過去の出来事</span>
-                <button class="lane-add" data-add-type="action" type="button" title="過去の出来事を追加">+</button>
+                <span>&#36942;&#21435;&#12398;&#20986;&#26469;&#20107;</span>
+                <button class="lane-add" data-add-type="action" type="button" title="&#12459;&#12540;&#12489;&#12434;&#36861;&#21152;">+</button>
               </header>
               <div class="lane-body" data-lane="action"></div>
             </section>
-
             <section class="lane" data-type="branch">
               <header>
-                <span>気持ち</span>
-                <button class="lane-add" data-add-type="branch" type="button" title="気持ちを追加">+</button>
+                <span>&#27671;&#25345;&#12385;</span>
+                <button class="lane-add" data-add-type="branch" type="button" title="&#27671;&#25345;&#12385;&#12434;&#36861;&#21152;">+</button>
               </header>
               <div class="lane-body" data-lane="branch"></div>
             </section>
-
             <section class="lane" data-type="premise">
               <header>
-                <span>思い込み</span>
-                <button class="lane-add" data-add-type="premise" type="button" title="思い込みを追加">+</button>
+                <span>&#24605;&#12356;&#36796;&#12415;</span>
+                <button class="lane-add" data-add-type="premise" type="button" title="&#24605;&#12356;&#36796;&#12415;&#12434;&#36861;&#21152;">+</button>
               </header>
               <div class="lane-body" data-lane="premise"></div>
             </section>
-
             <section class="lane" data-type="core">
               <header>
-                <span>価値観</span>
-                <button class="lane-add" data-add-type="core" type="button" title="価値観を追加">+</button>
+                <span>&#20385;&#20516;&#35251;</span>
+                <button class="lane-add" data-add-type="core" type="button" title="&#20385;&#20516;&#35251;&#12434;&#36861;&#21152;">+</button>
               </header>
               <div class="lane-body" data-lane="core"></div>
             </section>
-
             <section class="lane" data-type="value">
               <header>
-                <span>新しい価値観</span>
-                <button class="lane-add" data-add-type="value" type="button" title="新しい価値観を追加">+</button>
+                <span>&#26032;&#12375;&#12356;&#20385;&#20516;&#35251;</span>
+                <button class="lane-add" data-add-type="value" type="button" title="&#26032;&#12375;&#12356;&#20385;&#20516;&#35251;&#12434;&#36861;&#21152;">+</button>
               </header>
               <div class="lane-body" data-lane="value"></div>
             </section>
-
             <section class="lane" data-type="practice">
               <header>
-                <span>試す行動</span>
-                <button class="lane-add" data-add-type="practice" type="button" title="試す行動を追加">+</button>
+                <span>&#35430;&#12377;&#34892;&#21205;</span>
+                <button class="lane-add" data-add-type="practice" type="button" title="&#35430;&#12377;&#34892;&#21205;&#12434;&#36861;&#21152;">+</button>
               </header>
               <div class="lane-body" data-lane="practice"></div>
             </section>
           </div>
         </section>
-
-        <aside class="inspector" aria-label="編集">
-          <div class="panel-title">選択中</div>
-          <div id="emptyState" class="empty-state">カードを選択</div>
-          <form id="editor" class="editor hidden">
-            <label>
-              種類
-              <select id="nodeType">
-                <option value="action">過去の出来事</option>
-                <option value="branch">気持ち</option>
-                <option value="premise">思い込み</option>
-                <option value="core">価値観</option>
-                <option value="value">新しい価値観</option>
-                <option value="practice">試す行動</option>
-              </select>
-            </label>
-            <label>
-              接続先
-              <select id="nodeParent"></select>
-            </label>
-            <label class="hidden">
-              確信度
-              <input id="nodeConfidence" type="range" min="0" max="100" step="5">
-            </label>
-            <div class="confidence-row hidden">
-              <span>仮説</span>
-              <strong id="confidenceValue">50%</strong>
-              <span>確か</span>
-            </div>
-            <div class="button-row">
-              <button id="addChild" class="button primary" type="button">次のカードを追加</button>
-              <button id="deleteNode" class="button danger" type="button">削除</button>
-            </div>
-          </form>
-        </aside>
       </section>
     </main>
 
+    <nav class="mobile-dock" id="mobileDock" aria-label="&#20027;&#35201;&#25805;&#20316;">
+      <button class="button primary" id="mobileStartAction" type="button">&#20170;&#12377;&#12368;&#34892;&#21205;&#38283;&#22987;</button>
+    </nav>
+
+    <aside class="inspector" aria-label="&#35443;&#32048;" hidden>
+      <div class="panel-title">&#36984;&#25246;&#20013;</div>
+      <div id="emptyState" class="empty-state">&#12459;&#12540;&#12489;&#12434;&#36984;&#25246;</div>
+      <form id="editor" class="editor hidden">
+        <select id="nodeType">
+          <option value="action">&#36942;&#21435;&#12398;&#20986;&#26469;&#20107;</option>
+          <option value="branch">&#27671;&#25345;&#12385;</option>
+          <option value="premise">&#24605;&#12356;&#36796;&#12415;</option>
+          <option value="core">&#20385;&#20516;&#35251;</option>
+          <option value="value">&#26032;&#12375;&#12356;&#20385;&#20516;&#35251;</option>
+          <option value="practice">&#35430;&#12377;&#34892;&#21205;</option>
+        </select>
+        <select id="nodeParent"></select>
+        <input id="nodeConfidence" type="range" min="0" max="100" step="5">
+        <strong id="confidenceValue">50%</strong>
+        <button id="addChild" class="button primary" type="button">&#27425;&#12398;&#12459;&#12540;&#12489;&#12434;&#36861;&#21152;</button>
+        <button id="deleteNode" class="button danger" type="button">&#21066;&#38500;</button>
+      </form>
+    </aside>
+
     <section class="experiment-overlay hidden" id="experimentOverlay" aria-live="polite">
       <div class="experiment-focus">
-        <p class="experiment-kicker">行動中</p>
+        <p class="experiment-kicker">&#34892;&#21205;&#20013;</p>
         <h2 id="overlayPracticeText"></h2>
         <div class="overlay-timer" id="overlayTimer">00:00</div>
-        <p class="overlay-note">成果ではなく、手をつけた時の感覚を観察する</p>
-        <button class="overlay-end" id="overlayEnd" type="button">終了して振り返る</button>
+        <p class="overlay-note">&#23436;&#29863;&#12391;&#12394;&#12367;&#12390;OK&#12290;&#32066;&#12431;&#12387;&#12383;&#12425;&#27671;&#12389;&#12365;&#12434;&#27531;&#12381;&#12358;&#12290;</p>
+        <button class="overlay-end" id="overlayEnd" type="button">&#32066;&#20102;&#12375;&#12390;&#25391;&#12426;&#36820;&#12427;</button>
       </div>
     </section>
 
-    <aside class="install-prompt hidden" id="installPrompt" aria-label="ホーム画面に追加">
+    <aside class="install-prompt hidden" id="installPrompt" aria-label="&#12507;&#12540;&#12512;&#30011;&#38754;&#12395;&#36861;&#21152;">
       <div>
-        <strong>ホーム画面に追加できます</strong>
-        <span>すぐ書けるように、アプリのように開けます。</span>
+        <strong>&#12507;&#12540;&#12512;&#30011;&#38754;&#12395;&#36861;&#21152;&#12391;&#12365;&#12414;&#12377;</strong>
+        <span>&#12377;&#12368;&#38283;&#12369;&#12427;&#12424;&#12358;&#12395;&#12289;&#12450;&#12503;&#12522;&#12398;&#12424;&#12358;&#12395;&#20351;&#12360;&#12414;&#12377;&#12290;</span>
       </div>
-      <button class="button primary" id="installApp" type="button">追加</button>
-      <button class="install-dismiss" id="dismissInstall" type="button" aria-label="閉じる">×</button>
+      <button class="button primary" id="installApp" type="button">&#36861;&#21152;</button>
+      <button class="install-dismiss" id="dismissInstall" type="button" aria-label="&#38281;&#12376;&#12427;">x</button>
     </aside>
 
     <template id="nodeTemplate">
       <article class="card">
-        <div class="card-meta" draggable="true" title="ドラッグして移動">
+        <div class="card-meta" draggable="true" title="drag">
           <span class="type-label"></span>
         </div>
         <p class="card-question"></p>
         <textarea class="card-text" rows="4"></textarea>
         <div class="card-tools">
-          <button class="card-link" type="button" title="接続を追加・解除">○</button>
-          <button class="card-add" type="button" title="次のカードを追加">+</button>
-          <button class="card-delete" type="button" title="削除">×</button>
+          <button class="card-link" type="button" title="link">↔</button>
+          <button class="card-add" type="button" title="add">+</button>
+          <button class="card-delete" type="button" title="delete">x</button>
         </div>
       </article>
     </template>

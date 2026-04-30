@@ -1,4 +1,4 @@
-const STORAGE_KEY = "self-map-current";
+﻿const STORAGE_KEY = "self-map-current";
 const LEGACY_STORAGE_KEYS = [
   "self-map-action-first-v2",
   "self-map-action-first-v1",
@@ -37,7 +37,7 @@ const writingQuestions = {
   premise: "その気持ちの奥に、どんな決めつけがありそう？",
   core: "今までの自分は、どんな価値観（ものさし）でこれを見ていた？",
   value: "これからは、どんな見方を試してみたい？",
-  practice: "今すぐできる10秒から3分の行動にすると？",
+  practice: "今すぐできる最初の一歩にすると？",
 };
 
 const defaultState = {
@@ -122,17 +122,17 @@ const experimentOverlay = document.querySelector("#experimentOverlay");
 const overlayPracticeText = document.querySelector("#overlayPracticeText");
 const overlayTimer = document.querySelector("#overlayTimer");
 const overlayEnd = document.querySelector("#overlayEnd");
+const mobileStartAction = document.querySelector("#mobileStartAction");
 const installPrompt = document.querySelector("#installPrompt");
 const installApp = document.querySelector("#installApp");
 const dismissInstall = document.querySelector("#dismissInstall");
 let deferredInstallPrompt = null;
+let quickActionPanel = null;
+let quickActionInput = null;
+let quickActionNodeId = null;
 
-document.querySelector("#addRoot").addEventListener("click", () => addNode(null, "action", { prepend: true }));
 document.querySelector("#newEntry").addEventListener("click", createEntry);
-document.querySelector("#archiveEntry").addEventListener("click", archiveCurrentEntry);
 document.querySelector("#deleteEntry").addEventListener("click", deleteCurrentEntry);
-document.querySelector("#toggleArchived").addEventListener("click", toggleArchivedEntries);
-document.querySelector("#stepMode").addEventListener("click", toggleStepMode);
 document.querySelector("#prevStep").addEventListener("click", () => moveStep(-1));
 document.querySelector("#nextStep").addEventListener("click", () => moveStep(1));
 installApp.addEventListener("click", installPwa);
@@ -150,6 +150,7 @@ overlayEnd.addEventListener("click", () => {
   const activeSession = getActiveSession();
   if (activeSession) endSession(activeSession.id);
 });
+mobileStartAction?.addEventListener("click", handleQuickStartClick);
 
 coreText.addEventListener("input", () => {
   state.core = coreText.value;
@@ -221,6 +222,7 @@ document.querySelectorAll(".lane-body").forEach((lane) => {
 render();
 if (state.activeSessionId) startTimer();
 updateExperimentOverlay();
+setupQuickActionComposer();
 setupInstallPrompt();
 
 function loadAppState() {
@@ -531,6 +533,10 @@ function render() {
       .forEach((node) => lane.append(renderCard(node)));
   }
 
+  if (mobileStartAction) {
+    mobileStartAction.textContent = getActiveSession() ? "行動を終える" : "今すぐ行動開始";
+  }
+
   renderEditor();
   requestAnimationFrame(() => {
     drawLinks();
@@ -540,8 +546,6 @@ function render() {
 
 function renderEntryTabs() {
   entryTabs.innerHTML = "";
-  document.querySelector("#toggleArchived").textContent = showArchivedEntries ? "通常を見る" : "保管を見る";
-  document.querySelector("#archiveEntry").textContent = state.archivedAt ? "保管解除" : "保管";
   for (const entry of [...getVisibleEntries()].sort((a, b) => b.updatedAt - a.updatedAt)) {
     const wrapper = document.createElement("div");
     wrapper.className = "entry-tab";
@@ -551,7 +555,7 @@ function renderEntryTabs() {
     const name = document.createElement("input");
     name.className = "entry-title-input";
     name.value = deriveEntryTitle(entry);
-    name.setAttribute("aria-label", "出来事の名前");
+    name.setAttribute("aria-label", "場面の名前");
     name.addEventListener("focus", () => switchEntry(entry.id));
     name.addEventListener("input", () => {
       entry.customTitle = name.value;
@@ -582,7 +586,7 @@ function createEntry() {
     activeSessionId: null,
     sessions: [],
     nodes: [],
-    customTitle: "新しい出来事",
+    customTitle: "新しい場面",
     createdAt: Date.now(),
     updatedAt: Date.now(),
   });
@@ -592,38 +596,16 @@ function createEntry() {
   addNode(null, "action", { prepend: true });
 }
 
-function archiveCurrentEntry() {
-  const activeEntries = appState.entries.filter((entry) => !entry.archivedAt);
-  if (!state.archivedAt && activeEntries.length <= 1) {
-    alert("最後の出来事は保管できません。新しい出来事を作ってから保管してください。");
-    return;
-  }
-  state.archivedAt = state.archivedAt ? null : Date.now();
-  if (state.archivedAt) {
-    const nextEntry = appState.entries.find((entry) => !entry.archivedAt && entry.id !== state.id);
-    if (nextEntry) appState.activeEntryId = nextEntry.id;
-  }
-  saveAndRender();
-}
-
 function deleteCurrentEntry() {
   if (appState.entries.length <= 1) {
-    alert("最後の出来事は削除できません。初期例に戻すか、内容を書き換えて使ってください。");
+    alert("最後の場面は削除できません。初期例に戻すか、内容を書き換えて使ってください。");
     return;
   }
-  if (!confirm("この出来事を削除しますか？元に戻せません。")) return;
+  if (!confirm("この場面を削除しますか？元に戻せません。")) return;
   const deletingId = state.id;
   appState.entries = appState.entries.filter((entry) => entry.id !== deletingId);
   appState.activeEntryId = getVisibleEntries()[0]?.id ?? appState.entries[0].id;
   state = getActiveEntry();
-  saveAndRender();
-}
-
-function toggleArchivedEntries() {
-  showArchivedEntries = !showArchivedEntries;
-  if (!getVisibleEntries().some((entry) => entry.id === appState.activeEntryId)) {
-    appState.activeEntryId = getVisibleEntries()[0]?.id ?? appState.entries[0].id;
-  }
   saveAndRender();
 }
 
@@ -642,7 +624,7 @@ function deriveEntryTitle(entry) {
   if (entry.customTitle?.trim()) return entry.customTitle.trim();
   const actionText = entry.nodes?.find((node) => node.type === "action" && node.text.trim())?.text.trim();
   if (actionText) return actionText.slice(0, 28);
-  return "新しい出来事";
+  return "新しい場面";
 }
 
 function formatEntryDate(timestamp) {
@@ -675,9 +657,8 @@ function moveStep(delta) {
 }
 
 function renderStepMode() {
-  document.body.classList.toggle("step-mode", stepMode);
-  document.querySelector("#stepMode").classList.toggle("primary", stepMode);
-  document.querySelector("#stepMode").classList.toggle("secondary", !stepMode);
+  stepMode = false;
+  document.body.classList.remove("step-mode");
   stepControls.classList.toggle("hidden", !stepMode);
   const activeType = typeOrder[stepIndex];
   stepLabel.textContent = `${stepIndex + 1}/${typeOrder.length} ${typeLabels[activeType]}`;
@@ -696,7 +677,7 @@ function updateConnectionStatus() {
     return;
   }
   const preview = source.text.trim() || writingPrompts[source.type] || "未入力のカード";
-  connectionStatus.textContent = `接続中: ${typeLabels[source.type]}「${preview.slice(0, 28)}」から線を引く`;
+  connectionStatus.textContent = `接続中: ${typeLabels[source.type]}「${preview.slice(0, 28)}」とつなぐ相手を選ぶ`;
 }
 
 function renderCard(node) {
@@ -768,8 +749,8 @@ function renderCard(node) {
     if (!dragged) return;
 
     if (canReconnectTo(node.id)) {
-      addConnection(dragged, node.id);
-      state.selectedId = dragged.id;
+      connectNodes(activeId, node.id);
+      state.selectedId = activeId;
       dropHandled = true;
       saveAndRender();
       return;
@@ -1030,12 +1011,10 @@ function drawLinks() {
 }
 
 function canReconnectTo(targetId) {
-  const dragged = findNode(draggedId ?? linkingId);
-  const target = findNode(targetId);
-  if (!dragged || !target) return false;
-  if (target.id === dragged.id) return false;
-  if (previousType(dragged.type) !== target.type) return false;
-  return !collectDescendants(dragged.id).has(target.id);
+  const sourceId = draggedId ?? linkingId;
+  const pair = getConnectionPair(sourceId, targetId);
+  if (!pair) return false;
+  return !collectDescendants(pair.child.id).has(pair.parent.id);
 }
 
 function startLinking(id) {
@@ -1056,11 +1035,34 @@ function markLinkTargets() {
 
 function reconnectTo(targetId) {
   if (!linkingId) return;
-  const child = findNode(linkingId);
-  if (!child || !canReconnectTo(targetId)) return;
-  toggleConnection(child, targetId);
-  state.selectedId = child.id;
+  if (!canReconnectTo(targetId)) return;
+  connectNodes(linkingId, targetId, { toggle: true });
+  state.selectedId = linkingId;
   saveAndRender();
+}
+
+function connectNodes(sourceId, targetId, options = {}) {
+  const pair = getConnectionPair(sourceId, targetId);
+  if (!pair) return;
+  if (options.toggle) {
+    toggleConnection(pair.child, pair.parent.id);
+    return;
+  }
+  addConnection(pair.child, pair.parent.id);
+}
+
+function getConnectionPair(sourceId, targetId) {
+  const source = findNode(sourceId);
+  const target = findNode(targetId);
+  if (!source || !target || source.id === target.id) return null;
+
+  if (previousType(source.type) === target.type) {
+    return { child: source, parent: target };
+  }
+  if (previousType(target.type) === source.type) {
+    return { child: target, parent: source };
+  }
+  return null;
 }
 
 function addConnection(child, parentId) {
@@ -1078,8 +1080,8 @@ function toggleConnection(child, parentId) {
 }
 
 function isConnectedTo(childId, parentId) {
-  const child = findNode(childId);
-  return Boolean(child?.parentIds?.includes(parentId));
+  const pair = getConnectionPair(childId, parentId);
+  return Boolean(pair?.child.parentIds?.includes(pair.parent.id));
 }
 
 function canReorderWith(targetId) {
@@ -1107,9 +1109,118 @@ function moveNodeToEnd(id) {
   state.nodes.push(node);
 }
 
-function startSession(nodeId) {
+function handleQuickStartClick() {
+  const activeSession = getActiveSession();
+  if (activeSession) {
+    endSession(activeSession.id);
+    return;
+  }
+  const practice = getQuickStartPractice({ create: true });
+  if (practice) openQuickActionComposer(practice);
+}
+
+function getQuickStartPractice(options = {}) {
+  const selected = findNode(state.selectedId);
+  const practice =
+    selected?.type === "practice"
+      ? selected
+      : state.nodes.find((node) => node.type === "practice");
+  if (practice || !options.create) return practice ?? null;
+  return createPracticeNode();
+}
+
+function createPracticeNode() {
+  const node = {
+    id: crypto.randomUUID(),
+    parentIds: defaultParentFor("practice") ? [defaultParentFor("practice")] : [],
+    type: "practice",
+    text: "",
+    confidence: 50,
+  };
+  normalizeConnections(node);
+  state.nodes.push(node);
+  state.selectedId = node.id;
+  pendingFocusId = node.id;
+  saveAndRender();
+  return node;
+}
+
+function setupQuickActionComposer() {
+  quickActionPanel = document.createElement("section");
+  quickActionPanel.className = "quick-action-panel hidden";
+  quickActionPanel.innerHTML = `
+    <div>
+      <strong>今から何をする？</strong>
+      <span>すぐ始められる形にする</span>
+    </div>
+    <textarea class="quick-action-input" rows="3" placeholder="例: 途切れたら、責める前に1分だけ再開する"></textarea>
+    <div class="quick-action-buttons">
+      <button class="button secondary quick-action-cancel" type="button">閉じる</button>
+      <button class="button primary quick-action-start" type="button">この内容で開始</button>
+    </div>
+  `;
+  quickActionInput = quickActionPanel.querySelector(".quick-action-input");
+  quickActionInput.addEventListener("input", () => {
+    const node = findNode(quickActionNodeId);
+    if (!node) return;
+    node.text = quickActionInput.value;
+    state.selectedId = node.id;
+    saveState();
+  });
+  quickActionPanel.querySelector(".quick-action-cancel").addEventListener("click", closeQuickActionComposer);
+  quickActionPanel.querySelector(".quick-action-start").addEventListener("click", startQuickActionFromComposer);
+  document.body.append(quickActionPanel);
+}
+
+function openQuickActionComposer(node) {
+  if (!quickActionPanel) setupQuickActionComposer();
+  quickActionNodeId = node.id;
+  state.selectedId = node.id;
+  quickActionInput.value = node.text;
+  quickActionPanel.classList.remove("hidden");
+  saveAndRender();
+  requestAnimationFrame(() => {
+    quickActionInput.focus();
+    quickActionInput.select();
+  });
+}
+
+function closeQuickActionComposer() {
+  const node = findNode(quickActionNodeId);
+  if (node) {
+    node.text = quickActionInput.value;
+    state.selectedId = node.id;
+    saveAndRender();
+  }
+  quickActionPanel?.classList.add("hidden");
+  quickActionNodeId = null;
+}
+
+function startQuickActionFromComposer() {
+  const node = findNode(quickActionNodeId) ?? getQuickStartPractice({ create: true });
+  if (!node) return;
+  node.text = quickActionInput.value.trim();
+  state.selectedId = node.id;
+  pendingFocusId = node.id;
+  if (!node.text) {
+    saveAndRender();
+    showSaveStatus("行動内容を書けるカードを用意しました");
+    return;
+  }
+  closeQuickActionComposer();
+  saveState();
+  startSession(node.id, { allowEmpty: true });
+}
+
+function startSession(nodeId, options = {}) {
   if (getActiveSession()) {
     showSaveStatus("行動中のカードがあります");
+    return;
+  }
+  const node = findNode(nodeId);
+  if (!options.allowEmpty && node?.type === "practice" && !node.text.trim()) {
+    openQuickActionComposer(node);
+    showSaveStatus("行動内容を書いてから開始できます");
     return;
   }
   const session = {
@@ -1372,4 +1483,20 @@ function focusPendingNode() {
   if (!textInput) return;
   textInput.focus();
   textInput.select();
+}
+
+// Final safety overrides.
+function getVisibleEntries() {
+  return appState.entries;
+}
+
+function hasCorruptedAppText(targetAppState) {
+  const values = targetAppState.entries.flatMap((entry) => [
+    entry.core,
+    entry.customTitle,
+    entry.title,
+    ...entry.nodes.map((node) => node.text),
+    ...entry.sessions.flatMap((session) => [session.result, session.feeling, session.nextAction]),
+  ]);
+  return values.some((value) => /[\u7e3a\u7e67\u8b5b\u8703\u83a0\u9687\u9081\u9aea\u83eb\u879f\u9666\u9a55\u8c4c\u8413\u86df\u8b17\u9711\u8709\u7aca\u8373\u8ae4]/.test(String(value)));
 }
