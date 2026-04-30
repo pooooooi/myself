@@ -1151,6 +1151,11 @@ function setupQuickActionComposer() {
       <strong>今から何をする？</strong>
       <span>すぐ始められる形にする</span>
     </div>
+    <div class="quick-action-examples" aria-label="行動の例">
+      <button class="quick-action-example" type="button">開いて、最初の1行だけ見る</button>
+      <button class="quick-action-example" type="button">宛先だけ開く</button>
+      <button class="quick-action-example" type="button">目の前の1つだけ動かす</button>
+    </div>
     <textarea class="quick-action-input" rows="3" placeholder="例: 途切れたら、責める前に1分だけ再開する"></textarea>
     <div class="quick-action-buttons">
       <button class="button secondary quick-action-cancel" type="button">閉じる</button>
@@ -1167,6 +1172,18 @@ function setupQuickActionComposer() {
   });
   quickActionPanel.querySelector(".quick-action-cancel").addEventListener("click", closeQuickActionComposer);
   quickActionPanel.querySelector(".quick-action-start").addEventListener("click", startQuickActionFromComposer);
+  quickActionPanel.querySelectorAll(".quick-action-example").forEach((button) => {
+    button.addEventListener("click", () => {
+      quickActionInput.value = button.textContent.trim();
+      const node = findNode(quickActionNodeId);
+      if (node) {
+        node.text = quickActionInput.value;
+        state.selectedId = node.id;
+        saveState();
+      }
+      quickActionInput.focus();
+    });
+  });
   document.body.append(quickActionPanel);
 }
 
