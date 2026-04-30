@@ -16,9 +16,16 @@
   <body>
     <main class="app">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">&#33258;&#24049;&#29702;&#35299;&#12392;&#24605;&#32771;&#25972;&#29702;</p>
-          <h1><span>&#83;&#101;&#108;&#102;&#32;&#77;&#97;&#112;&#65306;</span><span>&#36855;&#12431;&#12378;&#21205;&#12367;&#12383;&#12417;&#12398;&#12494;&#12540;&#12488;</span></h1>
+        <div class="title-area">
+          <div>
+            <p class="eyebrow">&#33258;&#24049;&#29702;&#35299;&#12392;&#24605;&#32771;&#25972;&#29702;</p>
+            <h1><span>&#83;&#101;&#108;&#102;&#32;&#77;&#97;&#112;&#65306;</span><span>&#36855;&#12431;&#12378;&#21205;&#12367;&#12383;&#12417;&#12398;&#12494;&#12540;&#12488;</span></h1>
+          </div>
+          <div class="language-switch" aria-label="Language">
+            <button type="button" data-language="ja">&#26085;</button>
+            <button type="button" data-language="en">EN</button>
+            <button type="button" data-language="zh">&#20013;</button>
+          </div>
         </div>
         <div class="actions">
           <span class="save-status" id="saveStatus">&#20445;&#23384;&#28168;&#12415;</span>
@@ -190,7 +197,7 @@
 
     <script src="app.js"></script>
     <script>
-      if ("serviceWorker" in navigator) {
+      if ("serviceWorker" in navigator && !window.Capacitor?.isNativePlatform?.()) {
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("service-worker.js");
         });
