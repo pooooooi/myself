@@ -332,6 +332,7 @@ function normalizeState(rawState) {
         : null,
       result: typeof session.result === "string" ? session.result : "",
       feeling: typeof session.feeling === "string" ? session.feeling : "",
+      outcome: typeof session.outcome === "string" ? session.outcome : "",
       nextAction: typeof session.nextAction === "string" ? session.nextAction : "",
     }))
     .filter((session) => nodeIds.has(session.nodeId));
@@ -630,6 +631,14 @@ function formatEntryDate(timestamp) {
   if (Number.isNaN(date.getTime())) return "";
   return `${date.getMonth() + 1}/${date.getDate()}`;
 }
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
 function renderLaneHeaders() {
   document.querySelectorAll(".lane").forEach((lane) => {
     const label = typeLabels[lane.dataset.type];
@@ -688,9 +697,12 @@ function renderCard(node) {
   card.classList.toggle("connected-target", Boolean(linkingId) && isConnectedTo(linkingId, node.id));
   card.querySelector(".type-label").textContent = typeLabels[node.type];
   card.querySelector(".card-question").textContent = writingQuestions[node.type];
+  const addButton = card.querySelector(".card-add");
+  addButton.textContent = node.type === "practice" ? "+" : "次を書く";
+  addButton.title = node.type === "practice" ? "add" : `次を書く: ${typeLabels[childTypeFor(node.type)]}`;
 
   const textInput = card.querySelector(".card-text");
-  textInput.placeholder = writingPrompts[node.type] ?? "ここに書く";
+  textInput.placeholder = placeholderForNode(node);
   textInput.value = node.text;
   resizeText(textInput);
 
@@ -770,7 +782,7 @@ function renderCard(node) {
     drawLinks();
   });
 
-  card.querySelector(".card-add").addEventListener("click", (event) => {
+  addButton.addEventListener("click", (event) => {
     event.stopPropagation();
     addNode(node.id, childTypeFor(node.type));
   });
@@ -791,6 +803,17 @@ function renderCard(node) {
 
   if (node.type === "practice") renderPracticeTools(card, node);
   return card;
+}
+
+function placeholderForNode(node) {
+  if (
+    node.type === "action" &&
+    state.nodes.filter((candidate) => candidate.type === "action").length === 1 &&
+    !node.text.trim()
+  ) {
+    return "例: さっき気になった場面をそのまま書く。うまく書こうとしなくてOK。";
+  }
+  return writingPrompts[node.type] ?? "ここに書く";
 }
 
 function isPracticeTooLarge(text) {
@@ -873,10 +896,22 @@ function renderReflectionSummary(session) {
   wrapper.innerHTML = `
     <div class="experiment-row">
       <span>前回 ${formatDuration(session.durationSec ?? elapsedSec(session))}</span>
-      <button class="reflection-toggle" type="button">${isOpen ? "閉じる" : "振り返る"}</button>
+      <strong>${session.outcome || "どうだった？"}</strong>
     </div>
+    <div class="reflection-outcomes" aria-label="行動の振り返り">
+      <button class="${session.outcome === "できた" ? "active" : ""}" type="button" data-outcome="できた">できた</button>
+      <button class="${session.outcome === "少しできた" ? "active" : ""}" type="button" data-outcome="少しできた">少しできた</button>
+      <button class="${session.outcome === "できなかった" ? "active" : ""}" type="button" data-outcome="できなかった">できなかった</button>
+    </div>
+    <button class="reflection-toggle" type="button">${isOpen ? "メモを閉じる" : "必要ならメモ"}</button>
   `;
 
+  wrapper.querySelectorAll("[data-outcome]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      setSessionOutcome(session, button.dataset.outcome);
+    });
+  });
   wrapper.querySelector(".reflection-toggle").addEventListener("click", (event) => {
     event.stopPropagation();
     if (expandedReflections.has(session.id)) {
@@ -891,6 +926,13 @@ function renderReflectionSummary(session) {
   return wrapper;
 }
 
+function setSessionOutcome(session, outcome) {
+  session.outcome = outcome;
+  session.feeling = outcome;
+  saveAndRender();
+  showSaveStatus("振り返りを保存しました");
+}
+
 function renderReflection(session) {
   const panel = document.createElement("section");
   panel.className = "reflection-fields";
@@ -900,16 +942,6 @@ function renderReflection(session) {
       <textarea class="session-result" rows="3"></textarea>
     </label>
     <label>
-      感覚
-      <select class="session-feeling">
-        <option value="">選ぶ</option>
-        <option value="軽かった">軽かった</option>
-        <option value="普通">普通</option>
-        <option value="重かった">重かった</option>
-        <option value="無理だった">無理だった</option>
-      </select>
-    </label>
-    <label>
       次はどう調整する？
       <textarea class="session-next" rows="3"></textarea>
     </label>
@@ -917,18 +949,12 @@ function renderReflection(session) {
   `;
 
   const result = panel.querySelector(".session-result");
-  const feeling = panel.querySelector(".session-feeling");
   const next = panel.querySelector(".session-next");
   result.value = session.result;
-  feeling.value = session.feeling;
   next.value = session.nextAction;
 
   result.addEventListener("input", () => {
     session.result = result.value;
-    saveState();
-  });
-  feeling.addEventListener("input", () => {
-    session.feeling = feeling.value;
     saveState();
   });
   next.addEventListener("input", () => {
@@ -980,6 +1006,8 @@ function drawLinks() {
   links.setAttribute("width", panel.scrollWidth);
   links.setAttribute("height", panel.scrollHeight);
   links.setAttribute("viewBox", `0 0 ${panel.scrollWidth} ${panel.scrollHeight}`);
+  links.style.width = `${panel.scrollWidth}px`;
+  links.style.height = `${panel.scrollHeight}px`;
   links.innerHTML = "";
 
   for (const node of state.nodes) {
@@ -1021,6 +1049,7 @@ function startLinking(id) {
   updateConnectionStatus();
   drawLinks();
   markLinkTargets();
+  showSaveStatus(linkingId ? "つなぐ相手を選んでください" : "接続を解除しました");
 }
 
 function markLinkTargets() {
@@ -1246,6 +1275,7 @@ function startSession(nodeId, options = {}) {
     durationSec: null,
     result: "",
     feeling: "",
+    outcome: "",
     nextAction: "",
   };
   state.sessions.push(session);
