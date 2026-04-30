@@ -1,4 +1,4 @@
-const CACHE_NAME = "self-map-v21";
+const CACHE_NAME = "self-map-v22";
 const APP_SHELL = [
   "./",
   "./index.html",
