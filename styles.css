@@ -150,15 +150,27 @@ h1 span {
   white-space: nowrap;
 }
 
-.language-switch {
-  min-height: 34px;
+.language-control {
+  flex: 0 0 auto;
   display: grid;
-  grid-template-columns: repeat(3, 34px);
+  gap: 4px;
+  justify-items: end;
+  margin-top: 1px;
+}
+
+.language-control span {
+  color: #8792a1;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.language-switch {
+  min-height: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
   border: 1px solid #d7dce3;
   border-radius: 999px;
   background: #ffffff;
-  flex: 0 0 auto;
-  margin-top: 2px;
   padding: 3px;
 }
 
@@ -167,7 +179,7 @@ h1 span {
   border-radius: 999px;
   background: transparent;
   color: #64748b;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 780;
 }
 
@@ -1340,9 +1352,13 @@ h1 span {
     white-space: nowrap;
   }
 
+  .language-control span {
+    font-size: 10px;
+  }
+
   .language-switch {
-    grid-template-columns: repeat(3, 30px);
-    min-height: 32px;
+    grid-template-columns: repeat(3, 31px);
+    min-height: 30px;
   }
 
   .actions .save-status {
