@@ -10,6 +10,7 @@ const APP_SHELL = [
   "./small-action.html",
   "./articles.html",
   "./about.html",
+  "./development-notes.html",
   "./article-first-sentence.html",
   "./article-small-action-list.html",
   "./article-assumption-value.html",
