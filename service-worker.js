@@ -1,4 +1,4 @@
-const CACHE_NAME = "self-map-v25";
+const CACHE_NAME = "self-map-v26";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,6 +8,13 @@ const APP_SHELL = [
   "./guide.html",
   "./examples.html",
   "./small-action.html",
+  "./articles.html",
+  "./about.html",
+  "./article-first-sentence.html",
+  "./article-small-action-list.html",
+  "./article-assumption-value.html",
+  "./article-reflection.html",
+  "./article-private-note.html",
   "./privacy.html",
   "./icon.svg",
 ];

@@ -1,6 +1,6 @@
 # Web 公開メモ
 
-対象ドメイン: `infobeginer.com`
+対象ドメイン: `app.infobeginer.com`
 
 ## こちらで準備したもの
 
@@ -17,7 +17,7 @@ GitHub のリポジトリ画面で以下を設定します。
 2. `Pages` を開く
 3. Source を `Deploy from a branch` にする
 4. Branch を `main`、Folder を `/ (root)` にする
-5. Custom domain に `infobeginer.com` を入れる
+5. Custom domain に `app.infobeginer.com` を入れる
 6. DNS反映後に `Enforce HTTPS` を有効にする
 
 ## DNS 設定
@@ -26,7 +26,7 @@ GitHub のリポジトリ画面で以下を設定します。
 
 ### Apex domain
 
-`infobeginer.com` 用に A レコードを4つ設定します。
+`infobeginer.com` 全体を GitHub Pages に向ける場合は A レコードを使います。
 
 ```text
 Type: A
@@ -79,6 +79,12 @@ Value: pooooooi.github.io
 - `https://infobeginer.com/`
 - `https://infobeginer.com/privacy.html`
 - `https://infobeginer.com/ads.txt`
+
+`app.infobeginer.com` でアプリ本体だけを公開する場合は、以下を確認します。
+
+- `https://app.infobeginer.com/`
+- `https://app.infobeginer.com/privacy.html`
+- `https://app.infobeginer.com/articles.html`
 
 ## AdSense
 

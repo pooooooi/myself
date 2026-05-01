@@ -940,6 +940,37 @@ h1 span {
   gap: 10px;
 }
 
+.article-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.article-card {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--soft-shadow);
+  padding: 16px;
+  text-decoration: none;
+}
+
+.article-card strong {
+  color: #334155;
+  font-size: 16px;
+}
+
+.article-card span {
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.article-card:hover {
+  border-color: #f0b1a8;
+}
+
 .example-card {
   display: grid;
   gap: 6px;
@@ -1407,6 +1438,10 @@ h1 span {
   }
 
   .example-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .article-list {
     grid-template-columns: 1fr;
   }
 }
