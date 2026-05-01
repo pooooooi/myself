@@ -5,6 +5,9 @@ const APP_SHELL = [
   "./styles.css",
   "./app.js",
   "./manifest.json",
+  "./guide.html",
+  "./examples.html",
+  "./small-action.html",
   "./privacy.html",
   "./icon.svg",
 ];

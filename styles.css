@@ -770,6 +770,7 @@ h1 span {
 
 .site-footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
   color: #77808f;
@@ -837,6 +838,150 @@ h1 span {
 
 .legal-content ul {
   padding-left: 20px;
+}
+
+.content-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 18px 56px;
+}
+
+.content-hero {
+  display: grid;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 22px;
+  padding-bottom: 22px;
+}
+
+.content-hero nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.content-hero nav a,
+.content-link {
+  color: var(--practice);
+  font-size: 13px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.content-hero h1 {
+  max-width: 780px;
+  font-size: 34px;
+}
+
+.content-hero p {
+  max-width: 700px;
+  margin: 0;
+  color: #64748b;
+  line-height: 1.75;
+}
+
+.content-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 22px;
+  align-items: start;
+}
+
+.article-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.article-section,
+.ad-slot,
+.summary-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--soft-shadow);
+}
+
+.article-section {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.article-section h2,
+.summary-panel h2 {
+  margin: 0;
+  color: #334155;
+  font-size: 19px;
+}
+
+.article-section p,
+.article-section li,
+.summary-panel p,
+.summary-panel li {
+  color: #475569;
+  line-height: 1.8;
+}
+
+.article-section p,
+.summary-panel p {
+  margin: 0;
+}
+
+.article-section ul,
+.article-section ol,
+.summary-panel ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.example-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.example-card {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #edf0f4;
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 12px;
+}
+
+.example-card strong {
+  color: #334155;
+  font-size: 13px;
+}
+
+.example-card span {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ad-slot {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  padding: 16px;
+  color: #8792a1;
+  font-size: 12px;
+  text-align: center;
+}
+
+.summary-panel {
+  position: sticky;
+  top: 14px;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.summary-panel .button {
+  display: grid;
+  place-items: center;
+  text-decoration: none;
 }
 
 .experiment-overlay {
@@ -1241,8 +1386,27 @@ h1 span {
 
   .site-footer {
     align-items: center;
-    flex-direction: column;
     gap: 4px;
     padding-bottom: 4px;
+  }
+
+  .content-page {
+    padding: 18px 10px 42px;
+  }
+
+  .content-hero h1 {
+    font-size: 27px;
+  }
+
+  .content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-panel {
+    position: static;
+  }
+
+  .example-grid {
+    grid-template-columns: 1fr;
   }
 }
