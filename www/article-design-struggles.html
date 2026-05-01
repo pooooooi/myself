@@ -1,0 +1,64 @@
+﻿<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#e44332">
+    <title>Self Map を作る中で迷ったこと - Self Map</title>
+    <meta name="description" content="Self Map の開発中に迷った設計判断。ボタン、線、広告、スマホ表示などをどう考えたか。">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="content-page">
+      <header class="content-hero">
+        <nav>
+          <a href="index.html">アプリを開く</a>
+          <a href="articles.html">読みもの</a>
+          <a href="development-notes.html">設計メモ</a>
+          <a href="privacy.html">Privacy</a>
+        </nav>
+        <p class="eyebrow">Development</p>
+        <h1>Self Map を作る中で迷ったこと</h1>
+        <p>このアプリは、機能を増やすより「迷わず小さく動けること」を優先して作っています。そのため、開発中には何度も削る判断をしました。</p>
+      </header>
+
+      <div class="content-layout">
+        <article class="article-stack">
+          <section class="article-section">
+            <h2>最初はボタンが増えすぎた</h2>
+            <p>カードを消す、つなぐ、次を書く、行動開始、振り返る。便利そうな操作を足していくと、すぐに画面が重くなりました。特にスマホでは、ボタンが多いだけで「どれを押せばいいのか」が分かりにくくなります。</p>
+            <p>そこで、普段は必要な操作だけ見せ、カードを選んだ時に関連操作を出す方向へ寄せました。削除の文字も、最初は記号に近い見た目でしたが、誤解しやすかったので「削除」と読める形にしました。小さな違いですが、入力中の不安を減らすには大事な調整です。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>線は便利だけど、邪魔にもなる</h2>
+            <p>Self Map では、出来事から気持ち、思い込み、価値観、試す行動へカードをつなげます。線が見えると関係が分かりやすい一方で、スマホでは画面が狭く、線が多いほど読みにくくなります。</p>
+            <p>そのため、線は前面に出しつつ、選択したカードに関係する線だけを強調する設計にしました。常に全部を強く見せるのではなく、今見ているものを中心にする。これは、思考整理そのものにも近い考え方です。</p>
+          </section>
+
+          <div class="ad-slot">Ad space</div>
+
+          <section class="article-section">
+            <h2>広告は入力画面に置かない</h2>
+            <p>Webで公開するなら広告を置く選択肢があります。ただ、このアプリの中心は、かなり個人的なことを書く時間です。気持ちや思い込みを書いている最中に広告が見えると、集中が切れたり、画面の意味が混ざったりします。</p>
+            <p>そのため、広告を使うとしても、読み物ページや説明ページ側に置く方針にしました。アプリ本体は静かに使える場所にする。これは収益よりも、道具としての信用を優先する判断です。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>「保管」より、今使う流れを大事にした</h2>
+            <p>途中では、出来事の保管や管理機能も考えました。でも最初に使う人にとっては、保管を見る、アーカイブする、といった言葉が増えるほど目的がぼやけます。Self Map は記録管理ツールではなく、今の考えを小さな行動へつなげるツールです。</p>
+            <p>だから、必要以上に管理機能を前に出さないようにしました。あとで見返せることは大事ですが、最初の画面では「書く」「次へ進む」「行動開始」が迷わず見えることを優先しています。</p>
+          </section>
+        </article>
+
+        <aside class="summary-panel">
+          <h2>設計の基準</h2>
+          <p>便利そうかどうかより、入力する人の集中を邪魔しないかを基準にしています。</p>
+          <a class="button primary" href="development-notes.html">設計メモを読む</a>
+        </aside>
+      </div>
+    </main>
+      <script src="site-nav.js" defer></script>
+  </body>
+</html>

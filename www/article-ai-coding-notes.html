@@ -1,0 +1,64 @@
+﻿<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#e44332">
+    <title>AIでアプリを作る時に守りたいこと - Self Map</title>
+    <meta name="description" content="Self Map の開発を通して見えた、AIでコードを書く時に守りたい設計基準と判断のメモ。">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="content-page">
+      <header class="content-hero">
+        <nav>
+          <a href="index.html">アプリを開く</a>
+          <a href="articles.html">読みもの</a>
+          <a href="development-notes.html">設計メモ</a>
+          <a href="privacy.html">Privacy</a>
+        </nav>
+        <p class="eyebrow">AI Coding</p>
+        <h1>AIでアプリを作る時に守りたいこと</h1>
+        <p>AIを使うと、機能はすぐ増やせます。だからこそ、何を増やさないかを先に決めることが大切です。</p>
+      </header>
+
+      <div class="content-layout">
+        <article class="article-stack">
+          <section class="article-section">
+            <h2>便利そうな機能ほど、一度止まる</h2>
+            <p>Self Map を作る中でも、追加できそうな機能はたくさんありました。出来事の保管、1問ずつ進むモード、行動履歴、チュートリアル、広告、アプリ化、言語切り替え。どれも単体では便利そうに見えます。</p>
+            <p>でも、すべてを前に出すと、最初に使う人は何をすればいいのか分からなくなります。AIでコードを書く時は、実装できることが増えるぶん、画面の意味を守る判断が必要になります。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>ユーザーの言葉をそのまま残す</h2>
+            <p>開発中に何度も大事になったのは、言葉の違和感でした。「行動」なのか「過去の出来事」なのか。「行動しよう」なのか「行動開始」なのか。「消す」なのか「削除」なのか。小さな表現の違いで、アプリの意味は変わります。</p>
+            <p>AIに任せる時でも、こうした言葉の感覚は人間側が持っていたほうがいい部分です。ユーザーが迷った言葉、嫌だと感じた言葉、しっくり来た言葉は、次の設計判断の材料になります。</p>
+          </section>
+
+          <div class="ad-slot">Ad space</div>
+
+          <section class="article-section">
+            <h2>デグレを疑う習慣を持つ</h2>
+            <p>機能を直したつもりでも、別の場所が戻ってしまうことがあります。ボタンを消したはずなのに残っている、次へ進むはずが移動しない、削除したらつながっているカードまで消える。こうした問題は、AIで素早く変更するほど起きやすくなります。</p>
+            <p>だから、変更したら必ず実際の操作で確認することが大切です。特にスマホ表示、削除、保存、言語切り替え、次のカードへの移動は、見た目だけでは分かりません。アプリとして出す前には、短いチェックリストを作って毎回見るのが安全です。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>最終的には思想が品質になる</h2>
+            <p>Self Map の中心には、「小さく行動するためのノート」という考えがあります。この思想があるから、広告は入力画面に置かない、行動開始を目立たせる、ボタンを増やしすぎない、スマホで横に進む、といった判断ができます。</p>
+            <p>AIで作る時ほど、最初に思想を言葉にしておくと迷いにくくなります。コードの量より、何を大事にしているか。その軸があると、後から機能を増やす時も、アプリの性格がぶれにくくなります。</p>
+          </section>
+        </article>
+
+        <aside class="summary-panel">
+          <h2>開発メモ</h2>
+          <p>AIは実装を速くできます。人間側は、何を大切にするアプリなのかを持ち続ける役目です。</p>
+          <a class="button primary" href="development-notes.html">設計メモを読む</a>
+        </aside>
+      </div>
+    </main>
+      <script src="site-nav.js" defer></script>
+  </body>
+</html>

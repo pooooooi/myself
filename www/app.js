@@ -121,6 +121,13 @@ const dictionaries = {
       overlayNote: "完璧でなくてOK。終わったら気づきを残そう。",
       overlayEnd: "終了して振り返る",
       startPoint: "起点にする",
+      linkGuide: "使い方",
+      linkExamples: "例",
+      linkArticles: "読む",
+      linkDevelopment: "設計",
+      linkAbout: "About",
+      linkPrivacy: "Privacy",
+      footerNote: "データはこの端末に保存されます。",
     },
   },
   en: {
@@ -228,6 +235,13 @@ const dictionaries = {
       overlayNote: "It does not need to be perfect. Leave a note when you finish.",
       overlayEnd: "Finish and reflect",
       startPoint: "Start point",
+      linkGuide: "Guide",
+      linkExamples: "Examples",
+      linkArticles: "Read",
+      linkDevelopment: "Design",
+      linkAbout: "About",
+      linkPrivacy: "Privacy",
+      footerNote: "Data is saved on this device.",
     },
   },
   zh: {
@@ -335,6 +349,13 @@ const dictionaries = {
       overlayNote: "不需要完美。结束后留下发现就好。",
       overlayEnd: "结束并回顾",
       startPoint: "作为起点",
+      linkGuide: "用法",
+      linkExamples: "例子",
+      linkArticles: "阅读",
+      linkDevelopment: "设计",
+      linkAbout: "关于",
+      linkPrivacy: "隐私",
+      footerNote: "数据保存在此设备上。",
     },
   },
 };
@@ -626,6 +647,7 @@ function applyStaticText() {
   document.querySelector("#dismissInstall")?.setAttribute("aria-label", ui("close"));
   renderGuideSteps();
   updateNodeTypeOptions();
+  updateLocalizedLinks();
   setupQuickActionComposer();
 }
 
@@ -643,6 +665,34 @@ function renderGuideSteps() {
     step.querySelector("span").textContent = body;
   });
 }
+
+function updateLocalizedLinks() {
+  const suffix = currentLanguage === "ja" ? "" : `-${currentLanguage}`;
+  const pageMap = {
+    guide: `guide${suffix}.html`,
+    examples: `examples${suffix}.html`,
+    articles: `articles${suffix}.html`,
+    development: `development-notes${suffix}.html`,
+    about: `about${suffix}.html`,
+    privacy: `privacy${suffix}.html`,
+  };
+  const labelMap = {
+    guide: ui("linkGuide"),
+    examples: ui("linkExamples"),
+    articles: ui("linkArticles"),
+    development: ui("linkDevelopment"),
+    about: ui("linkAbout"),
+    privacy: ui("linkPrivacy"),
+  };
+
+  document.querySelectorAll("[data-page]").forEach((link) => {
+    const page = link.dataset.page;
+    if (pageMap[page]) link.setAttribute("href", pageMap[page]);
+    if (labelMap[page]) link.textContent = labelMap[page];
+  });
+  setText('[data-localized="footerNote"]', ui("footerNote"));
+}
+
 
 function updateNodeTypeOptions() {
   [...nodeType.options].forEach((option) => {

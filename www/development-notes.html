@@ -1,0 +1,90 @@
+﻿<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#e44332">
+    <title>Self Map の設計メモ</title>
+    <meta name="description" content="Self Map を作る中で大切にした設計思想と、AIを使ったコード作成のメモ。">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="content-page">
+      <header class="content-hero">
+        <nav>
+          <a href="index.html">アプリを開く</a>
+          <a href="articles.html">読みもの</a>
+          <a href="guide.html">使い方</a>
+          <a href="examples.html">例を見る</a>
+          <a href="privacy.html">Privacy</a>
+        </nav>
+        <p class="eyebrow">Development Notes</p>
+        <h1>Self Map で大切にした設計思想</h1>
+        <p>このページは、Self Map を作る中でこだわった点を残すためのメモです。今後AIを使ってコードを作る時に、何を守るべきかを見失わないためにまとめています。</p>
+      </header>
+
+      <div class="content-layout">
+        <article class="article-stack">
+          <section class="article-section">
+            <h2>1. とにかく小さな行動につなげる</h2>
+            <p>このアプリの中心は、自己分析を深めることだけではありません。最後に「今すぐできる小さな行動」へ戻すことです。試す行動は目立たせ、行動開始ボタンはスマホでも押しやすい位置に置きました。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>2. 入力画面に広告を置かない</h2>
+            <p>感情や思い込みを書く画面に広告があると、集中が切れます。広告を使う場合でも、アプリ本体ではなく説明ページや記事ページ側に置く方針にしました。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>3. ボタンを増やしすぎない</h2>
+            <p>途中で、便利な機能を増やすほど画面が重くなることが分かりました。保管、1問いずつ、常時表示の補助パネルなどは、最初の体験では邪魔になりやすいため削りました。</p>
+          </section>
+
+          <div class="ad-slot">Ad space</div>
+
+          <section class="article-section">
+            <h2>4. スマホでは横に進む体験を優先する</h2>
+            <p>カードを縦に積むだけだと、線が邪魔になりやすく、流れも見えにくくなりました。スマホでは横スクロールで、過去の出来事から試す行動へ進む形にしています。「次を書く」を押した時は、次のパネルへ自動移動することも大事な操作感です。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>5. 削除は安全側にする</h2>
+            <p>カードを消した時に、つながっているカードまで全部消えると怖い。今は、押したカードだけを削除し、他のカードは残して接続だけ外す挙動にしています。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>6. 言葉の整合性を大切にする</h2>
+            <p>最初は「行動」という言葉が混ざっていましたが、左端は過去の振り返りなので「過去の出来事」、最後は未来に向けた「試す行動」に整理しました。言葉が少し違うだけで、ユーザーの迷いが増えます。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>7. 仏教的な見方を、宗教色ではなく設計に取り入れる</h2>
+            <p>Self Map では、仏教の考え方をそのまま説明するのではなく、「出来事と反応を分けて見る」「思い込みに気づく」「執着を少しゆるめる」「次の小さな行動へ戻る」という形で取り入れています。</p>
+            <p>たとえば、過去の出来事を書き、気持ちを書き、思い込みを見る流れは、自分を責めるためではありません。今起きている反応を観察し、少し距離を置くためです。そのうえで、新しい価値観と試す行動へ進むことで、理解だけで止まらず生活の中で小さく試せるようにしています。</p>
+          </section>
+
+          <section class="article-section">
+            <h2>8. AIに任せる時の注意</h2>
+            <p>AIは機能を足すのが得意ですが、足しすぎることもあります。これからAIでコードを書く時は、次の判断基準を先に伝えると良さそうです。</p>
+            <ul>
+              <li>アプリ本体は、入力と行動開始を最優先する</li>
+              <li>広告や説明は、入力画面から離す</li>
+              <li>スマホの親指操作を優先する</li>
+              <li>削除など戻しにくい操作は安全側にする</li>
+              <li>新機能より、今ある導線の分かりやすさを優先する</li>
+              <li>文言の整合性を必ず見直す</li>
+            </ul>
+          </section>
+        </article>
+
+        <aside class="summary-panel">
+          <h2>設計の軸</h2>
+          <p>小さく書く。小さく動く。入力体験を邪魔しない。これを今後の変更でも守ります。</p>
+          <a class="button primary" href="index.html">Self Map を開く</a>
+        </aside>
+      </div>
+    </main>
+      <script src="site-nav.js" defer></script>
+  </body>
+</html>
