@@ -1,4 +1,4 @@
-const CACHE_NAME = "self-map-v26";
+const CACHE_NAME = "self-map-v27";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,17 +6,31 @@ const APP_SHELL = [
   "./app.js",
   "./manifest.json",
   "./guide.html",
+  "./guide-en.html",
+  "./guide-zh.html",
   "./examples.html",
+  "./examples-en.html",
+  "./examples-zh.html",
   "./small-action.html",
+  "./small-action-en.html",
+  "./small-action-zh.html",
   "./articles.html",
+  "./articles-en.html",
+  "./articles-zh.html",
   "./about.html",
+  "./about-en.html",
+  "./about-zh.html",
   "./development-notes.html",
+  "./development-notes-en.html",
+  "./development-notes-zh.html",
   "./article-first-sentence.html",
   "./article-small-action-list.html",
   "./article-assumption-value.html",
   "./article-reflection.html",
   "./article-private-note.html",
   "./privacy.html",
+  "./privacy-en.html",
+  "./privacy-zh.html",
   "./icon.svg",
 ];
 
