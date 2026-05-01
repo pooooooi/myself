@@ -1,4 +1,4 @@
-const CACHE_NAME = "self-map-v27";
+const CACHE_NAME = "self-map-v28";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -28,6 +28,21 @@ const APP_SHELL = [
   "./article-assumption-value.html",
   "./article-reflection.html",
   "./article-private-note.html",
+  "./article-why-small-actions-work.html",
+  "./article-design-struggles.html",
+  "./article-overthinking-to-action.html",
+  "./article-mobile-writing.html",
+  "./article-ai-coding-notes.html",
+  "./article-why-small-actions-work-en.html",
+  "./article-design-struggles-en.html",
+  "./article-overthinking-to-action-en.html",
+  "./article-mobile-writing-en.html",
+  "./article-ai-coding-notes-en.html",
+  "./article-why-small-actions-work-zh.html",
+  "./article-design-struggles-zh.html",
+  "./article-overthinking-to-action-zh.html",
+  "./article-mobile-writing-zh.html",
+  "./article-ai-coding-notes-zh.html",
   "./privacy.html",
   "./privacy-en.html",
   "./privacy-zh.html",
