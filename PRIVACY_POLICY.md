@@ -79,8 +79,9 @@
 
 ## 10. お問い合わせ
 
-本プライバシーポリシーに関するお問い合わせ、不具合報告、改善提案は、以下の GitHub リポジトリまたは Issues からご連絡ください。
+本プライバシーポリシーに関するお問い合わせ、不具合報告、改善提案は、以下のメールアドレスまでご連絡ください。
 
+- メール: contact@infobeginer.com
 - GitHub リポジトリ: https://github.com/pooooooi/myself
 - Issues: https://github.com/pooooooi/myself/issues
 
